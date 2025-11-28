@@ -24,7 +24,7 @@ const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
 // Replace this with your Cloudflare Worker URL
-const R2_UPLOAD_URL = "https://teahug1.pages.dev/api/upload";
+const R2_UPLOAD_URL = "https://teahug.pages.dev/api/upload";
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   adminStatus.textContent = "Uploading... Please wait.";
