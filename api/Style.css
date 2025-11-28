@@ -1,0 +1,45 @@
+.admin-body {
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
+  padding: 20px;
+}
+
+.admin-container {
+  max-width: 600px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.admin-container h1 {
+  text-align: center;
+}
+
+#uploadForm label {
+  display: block;
+  margin-top: 10px;
+}
+
+#uploadForm input,
+#uploadForm button {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+}
+
+#songList {
+  margin-top: 20px;
+}
+
+.admin-song-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.admin-song-item img.admin-cover {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
