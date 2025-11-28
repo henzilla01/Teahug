@@ -24,7 +24,7 @@ const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
 // Replace this with your Cloudflare Worker URL
-const R2_UPLOAD_URL = import.meta.env.VITE_R2_UPLOAD_URL;
+const R2_UPLOAD_URL = https://pub-bf38f9589fd44fdc8fd0388dcd8eeba5.r2.dev/upload;
 
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -87,3 +87,4 @@ async function loadSongs() {
 }
 
 loadSongs();
+
