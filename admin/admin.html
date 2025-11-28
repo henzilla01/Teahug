@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Teahug Admin</title>
-  <link rel="stylesheet" href="../style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body class="admin-body">
 
@@ -19,10 +19,10 @@
       <input type="text" id="songArtist" required />
 
       <label>Upload Song (MP3)</label>
-      <input type="file" id="songFile" accept="audio/mpeg" required />
+      <input type="file" id="songFile" name="song" accept="audio/mpeg" required />
 
       <label>Upload Cover Image</label>
-      <input type="file" id="coverFile" accept="image/*" required />
+      <input type="file" id="coverFile" name="cover" accept="image/*" required />
 
       <button type="submit">Upload Song</button>
     </form>
@@ -32,6 +32,10 @@
     <h2>All Songs</h2>
     <div id="songList"></div>
   </div>
+
+  <!-- Firebase -->
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
 
   <script type="module" src="admin.js"></script>
 </body>
