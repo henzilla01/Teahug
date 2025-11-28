@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teahug Admin</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body class="admin-body">
+
+  <div class="admin-container">
+    <h1>Teahug Admin Panel</h1>
+
+    <form id="uploadForm">
+      <label>Song Title</label>
+      <input type="text" id="songTitle" required />
+
+      <label>Artist</label>
+      <input type="text" id="songArtist" required />
+
+      <label>Upload Song (MP3)</label>
+      <input type="file" id="songFile" accept="audio/mpeg" required />
+
+      <label>Upload Cover Image</label>
+      <input type="file" id="coverFile" accept="image/*" required />
+
+      <button type="submit">Upload Song</button>
+    </form>
+
+    <p id="adminStatus"></p>
+
+    <h2>All Songs</h2>
+    <div id="songList"></div>
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
