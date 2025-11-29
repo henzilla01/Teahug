@@ -8,56 +8,44 @@
 </head>
 <body>
 
-  <!-- INTRO POPUP -->
+  <!-- Hug Hour Countdown -->
+  <div id="countdown" class="hug-countdown">Loading countdown...</div>
+
+  <!-- TikTok-style Song Feed -->
+  <div id="songFeed"></div>
+
+  <!-- Intro Popup (auto-hide 5s) -->
   <div id="introPopup" class="popup">
-    <p>Welcome to TeaHug! 🎵</p>
+    <h2>TeaHug 🫖</h2>
+    <p>
+      "Set the MOOD with SURPRISES... not MESSAGES"<br>
+      Pick a song vibe. Set the mood. We deliver the surprise during nightly Hug Hours.
+    </p>
   </div>
 
-<div id="songFeed" class="song-feed"></div>
+  <!-- About Popup -->
+  <div id="aboutPopup" class="popup">
+    <h2>About TeaHug 🫖</h2>
+    <p>
+      Set the MOOD with SURPRISES... not MESSAGES.<br>
+      TeaHug turns your favorite songs into emotional surprises. Pick a 15-second snippet, choose your vibe, express your feelings, and we'll deliver it as a beautiful surprise.
+    </p>
+    <button onclick="closeAbout()">Close</button>
+  </div>
 
-<!-- About Popup -->
-<div id="aboutPopup" class="popup hidden">
-  <h2>About TeaHug 🫖</h2>
-  <p>"Set the MOOD with SURPRISES... not MESSAGES"</p>
-  <p>
-    TeaHug turns your favorite songs into emotional surprises. Pick a 15-second snippet, choose your vibe, express your feelings, and we'll deliver it as a beautiful surprise.
-  </p>
-  <p><strong>How it works:</strong></p>
-  <ol>
-    <li>Choose a song snippet (15 seconds)</li>
-    <li>Pick your mood/vibe</li>
-    <li>We deliver it during Hug Hour (9PM–12AM daily)</li>
-  </ol>
-  <p>No signup. No fees. We help you deliver just pure emotional connection.</p>
-  <p>Watch the countdown to Hug Hour and make someone's night with a surprise that actually means something.</p>
-  <p><strong>TeaHug:</strong> Set the MOOD with SURPRISES... not MESSAGES</p>
-  <p>Pick a song vibe. Set the mood. We deliver the surprise during nightly Hug Hours.</p>
-  <p><strong>Free • No Signup • Just Good Vibes</strong></p>
-  <button onclick="closeAbout()">Close</button>
-</div>
-
-<button id="aboutBtn" class="about-btn">About</button>
-
-  <!-- MESSAGE POPUP -->
-  <div id="messagePopup" class="popup hidden">
-    <h3 id="songTitle">Song Title</h3>
-    <textarea id="userMessage" placeholder="Type your message..."></textarea>
+  <!-- Message Popup -->
+  <div id="messagePopup" class="popup">
+    <h2>Send your surprise</h2>
+    <p id="songTitle">Song Title</p>
+    <input type="text" id="userMessage" placeholder="Type your message here">
     <button id="sendMsgBtn">Send</button>
-    <button onclick="closeMessageForm()">Close</button>
+    <button onclick="closeMessageForm()">Cancel</button>
   </div>
 
-  <!-- HEADER -->
-  <header>
-    <h1>TeaHug</h1>
-    <button id="aboutBtn">About</button>
-    <div id="countdown"></div>
-  </header>
+  <!-- About Button -->
+  <button id="aboutBtn" class="send-btn" style="position: fixed; top: 80px; right: 20px;">About</button>
 
-  <!-- SONG FEED -->
-  <div id="songFeed" class="song-feed"></div>
-
+  <!-- JS -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
-
-
