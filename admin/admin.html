@@ -1,89 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teahug Admin Panel</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    body.admin-body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
-    }
-    .admin-container {
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, button {
-      width: 100%;
-      margin: 5px 0 15px 0;
-      padding: 10px;
-    }
-    button {
-      cursor: pointer;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-    .admin-song-item {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-      background: #f0f0f0;
-      padding: 10px;
-      border-radius: 5px;
-    }
-    .admin-cover {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 5px;
-    }
-    audio {
-      width: 100%;
-      margin-top: 5px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeaHug Admin</title>
+  <link rel="stylesheet" href="../style.css">
 </head>
-<body class="admin-body">
+<body>
 
-  <div class="admin-container">
-    <h1>Teahug Admin Panel</h1>
+  <h1>TeaHug Admin Panel</h1>
 
-    <form id="uploadForm">
-      <label>Song Title</label>
-      <input type="text" id="songTitle" required />
+  <!-- UPLOAD FORM -->
+  <form id="uploadForm">
+    <label>Song Title:</label>
+    <input type="text" id="songTitle" required>
+    <label>Artist:</label>
+    <input type="text" id="songArtist" required>
+    <label>Song File (MP3):</label>
+    <input type="file" id="songFile" accept=".mp3" required>
+    <label>Cover Image:</label>
+    <input type="file" id="coverFile" accept="image/*" required>
+    <button type="submit">Upload Song</button>
+  </form>
+  <p id="adminStatus"></p>
 
-      <label>Artist</label>
-      <input type="text" id="songArtist" required />
+  <!-- SONG LIST -->
+  <h2>All Songs</h2>
+  <div id="songList"></div>
 
-      <label>Upload Song (MP3)</label>
-      <input type="file" id="songFile" accept="audio/mpeg" required />
-
-      <label>Upload Cover Image</label>
-      <input type="file" id="coverFile" accept="image/*" required />
-
-      <button type="submit">Upload Song</button>
-    </form>
-
-    <p id="adminStatus"></p>
-
-    <h2>All Songs</h2>
-    <div id="songList"></div>
-  </div>
-
-  <!-- Firebase -->
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
-
-  <!-- Admin JS -->
+  <!-- FIREBASE + ADMIN JS -->
   <script type="module" src="admin.js"></script>
-
 </body>
 </html>
