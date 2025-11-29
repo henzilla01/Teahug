@@ -25,7 +25,7 @@ const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
 // ⚠️ Use relative URL to Pages Function
-const R2_UPLOAD_URL = "https://pub-bf38f9589fd44fdc8fd0388dcd8eeba5.r2.dev";
+const R2_UPLOAD_URL = "https://e649bff25d83241bebe214ddd3beb656.pages.dev/api/upload";
 
 // Submit listener
 uploadForm.addEventListener("submit", async (e) => {
