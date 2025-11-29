@@ -46,6 +46,7 @@ body {
   font-size: 4rem;
   color: rgba(255, 255, 255, 0.8);
   cursor: pointer;
+  transition: opacity 0.3s;
 }
 
 /* ===============================
@@ -63,6 +64,12 @@ body {
   cursor: pointer;
   font-weight: bold;
   font-size: 1rem;
+  opacity: 0.9;
+  transition: opacity 0.3s;
+}
+
+.sendBtn:hover {
+  opacity: 1;
 }
 
 /* ===============================
@@ -73,13 +80,40 @@ body {
   top: 20%;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.85);
   padding: 1rem 2rem;
   border-radius: 10px;
   z-index: 100;
   text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 .hidden {
   display: none;
+}
+
+.aboutBtn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #ff0050;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ===============================
+   ANIMATIONS
+   =============================== */
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+@keyframes fadeOut {
+  0% {opacity: 1;}
+  100% {opacity: 0;}
 }
