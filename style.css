@@ -1,155 +1,183 @@
 /* ===============================
-   TEAHUG PUBLIC PAGE - TikTok Style
+   GENERAL RESET
    =============================== */
-
-/* Reset & basics */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
-body {
-  background-color: #000;
-  color: #fff;
+body, html {
+  width: 100%;
+  height: 100%;
   overflow-x: hidden;
+  background: #000;
+  color: #fff;
 }
 
+/* ===============================
+   SONG FEED - TIKTOK STYLE
+   =============================== */
 #songFeed {
-  height: 100vh;
-  overflow-y: hidden;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
   scroll-snap-type: y mandatory;
 }
 
 .song-card {
-  position: relative;
   width: 100%;
   height: 100vh;
-  background-size: cover;
-  background-position: center;
+  position: relative;
   scroll-snap-align: start;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 20px;
+  justify-content: center;
+  align-items: center;
+  background: #111;
 }
 
-.song-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 50%);
-  z-index: 1;
+.song-card img.song-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .play-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 60px;
+  font-size: 4rem;
   color: #fff;
-  z-index: 2;
+  text-shadow: 0 0 20px #000;
   pointer-events: none;
 }
 
-.send-btn {
-  position: relative;
-  z-index: 2;
-  background-color: #ff2d55;
+/* ===============================
+   SEND BUTTON
+   =============================== */
+.sendBtn {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #fff;
+  padding: 10px 20px;
+  border-radius: 25px;
   color: #fff;
-  border: none;
-  border-radius: 50px;
-  padding: 12px 25px;
-  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  margin-bottom: 50px;
-  align-self: flex-start;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.send-btn:hover {
+.sendBtn:hover {
+  background: rgba(255,255,255,0.2);
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(255,45,85,0.6);
 }
 
-/* Popups */
+/* ===============================
+   POPUPS
+   =============================== */
 .popup {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: #111;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.popup.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.popup-content {
+  background: #222;
   padding: 25px 35px;
   border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.6);
-  z-index: 100;
   max-width: 90%;
   text-align: center;
-  display: none;
-}
-
-.popup h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-.popup p {
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-.popup button {
-  margin-top: 15px;
-  background-color: #ff2d55;
-  border: none;
-  padding: 10px 20px;
   color: #fff;
-  font-weight: bold;
-  border-radius: 50px;
+}
+
+.popup-content h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.popup-content p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.popup-content button.close-btn {
+  margin-top: 15px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 10px;
+  background: #fff;
+  color: #000;
   cursor: pointer;
 }
 
-/* Countdown timer */
-.hug-countdown {
+/* ===============================
+   COUNTDOWN TIMER
+   =============================== */
+#countdown {
   position: fixed;
   top: 15px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 18px;
-  background-color: rgba(0,0,0,0.6);
+  background: rgba(255,255,255,0.1);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  z-index: 1000;
+}
+
+/* ===============================
+   ABOUT BUTTON
+   =============================== */
+#aboutBtn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  background: rgba(255,255,255,0.1);
   padding: 8px 15px;
   border-radius: 20px;
-  z-index: 10;
+  cursor: pointer;
   font-weight: bold;
-  color: #fff;
+  transition: all 0.2s ease;
 }
 
-/* Intro popup (shown on reload) */
-#introPopup {
-  display: block;
+#aboutBtn:hover {
+  background: rgba(255,255,255,0.2);
 }
 
-/* About popup */
-#aboutPopup {
+/* ===============================
+   AUDIO ELEMENTS (hidden)
+   =============================== */
+audio {
   display: none;
 }
 
-/* Message popup */
-#messagePopup {
-  display: none;
-}
+/* ===============================
+   RESPONSIVE
+   =============================== */
+@media (max-width: 768px) {
+  .sendBtn {
+    bottom: 60px;
+    right: 15px;
+    padding: 8px 18px;
+  }
 
-#messagePopup input {
-  width: 80%;
-  padding: 10px;
-  border-radius: 50px;
-  border: none;
-  margin-top: 10px;
-}
-
-#messagePopup button {
-  margin-top: 15px;
+  .popup-content {
+    padding: 20px;
+  }
 }
