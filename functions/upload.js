@@ -1,34 +1,43 @@
-export const onRequest = async ({ request, env }) => {
+export const config = {
+  path: "/api/upload",
+  memory: "128MB"
+};
+
+export async function onRequestPost({ request, env }) {
   try {
+    const MAX_SIZE = 8 * 1024 * 1024; // 8 MB per file
+
     const formData = await request.formData();
+    const song = formData.get("song");
+    const cover = formData.get("cover");
 
-    const songFile = formData.get("song");
-    const coverFile = formData.get("cover");
-
-    if (!songFile || !coverFile) {
-      return new Response(JSON.stringify({ success: false, error: "Files missing" }), { status: 400 });
+    if (!song || !cover) {
+      return new Response(JSON.stringify({ success: false, error: "Missing files" }), { status: 400 });
     }
 
-    // Upload to R2
-    const songKey = `songs/${songFile.name}`;
-    const coverKey = `covers/${coverFile.name}`;
+    if (song.size > MAX_SIZE || cover.size > MAX_SIZE) {
+      return new Response(JSON.stringify({ success: false, error: "File too large" }), { status: 413 });
+    }
 
-    await env.TEAHUG.put(songKey, songFile.stream());
-    await env.TEAHUG.put(coverKey, coverFile.stream());
+    // Upload to R2 bucket
+    const songKey = `songs/${song.name}`;
+    const coverKey = `covers/${cover.name}`;
 
-    // Construct public URLs (for Pages deployments)
-    const r2BaseURL = `https://${env.pub-bf38f9589fd44fdc8fd0388dcd8eeba5.r2.dev}/`; // replace PUBLIC_R2_DOMAIN with your R2 public domain
-    const songUrl = r2BaseURL + songKey;
-    const coverUrl = r2BaseURL + coverKey;
+    await env.TEAHUG1.put(songKey, await song.arrayBuffer(), {
+      httpMetadata: { contentType: song.type }
+    });
+
+    await env.TEAHUG1.put(coverKey, await cover.arrayBuffer(), {
+      httpMetadata: { contentType: cover.type }
+    });
 
     return new Response(JSON.stringify({
       success: true,
-      songUrl,
-      coverUrl
-    }), { status: 200 });
-
+      songUrl: `https://pub-83823864dc904706888338cd05e3b128.r2.dev/${songKey}`,
+      coverUrl: `https://pub-83823864dc904706888338cd05e3b128.r2.dev/${coverKey}`
+    }));
   } catch (err) {
     console.error(err);
     return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
   }
-};
+}
