@@ -81,6 +81,7 @@ function buildFeed() {
     card.querySelector(".sendBtn").addEventListener("click", () => openMessageForm(song));
 
     songFeed.appendChild(card);
+    songFeed.scrollTo(0, 0);
   });
 
   enableSwipe();
@@ -146,3 +147,4 @@ window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
 // Start
 loadSongs();
+
