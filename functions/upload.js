@@ -1,47 +1,47 @@
 export const onRequestPost = async ({ request, env }) => {
   try {
-    // Parse uploaded form data
+    // Parse the incoming form data
     const formData = await request.formData();
-    const song = formData.get("song");
-    const cover = formData.get("cover");
+    const songFile = formData.get("song");
+    const coverFile = formData.get("cover");
 
-    if (!song || !cover) {
-      return new Response(JSON.stringify({ success: false, error: "Missing files" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" }
-      });
+    if (!songFile || !coverFile) {
+      return new Response(JSON.stringify({
+        success: false,
+        message: "Both song and cover files are required."
+      }), { status: 400 });
     }
 
     // Generate unique filenames
-    const songFileName = `songs/${Date.now()}-${song.name}`;
-    const coverFileName = `covers/${Date.now()}-${cover.name}`;
+    const timestamp = Date.now();
+    const songName = `${timestamp}-${songFile.name}`;
+    const coverName = `${timestamp}-${coverFile.name}`;
 
     // Upload song to R2
-    await env.TeaHug.put(songFileName, await song.arrayBuffer(), {
-      httpMetadata: { contentType: song.type }
+    await env.TEAHUG.put(songName, songFile.stream(), {
+      httpMetadata: { contentType: songFile.type }
     });
 
     // Upload cover to R2
-    await env.TeaHug.put(coverFileName, await cover.arrayBuffer(), {
-      httpMetadata: { contentType: cover.type }
+    await env.TEAHUG.put(coverName, coverFile.stream(), {
+      httpMetadata: { contentType: coverFile.type }
     });
 
-    // PUBLIC URL format
-    const baseURL = "https://e649bff25d83241bebe214ddd3beb656.r2.cloudflarestorage.com";
+    // Build URLs
+    const songUrl = `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${songName}`;
+    const coverUrl = `https://${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${coverName}`;
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        songUrl: `${baseURL}/${songFileName}`,
-        coverUrl: `${baseURL}/${coverFileName}`
-      }),
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-  } catch (error) {
-    return new Response(JSON.stringify({ success: false, error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    return new Response(JSON.stringify({
+      success: true,
+      songUrl,
+      coverUrl
+    }), { status: 200 });
+  } catch (err) {
+    console.error(err);
+    return new Response(JSON.stringify({
+      success: false,
+      message: "Upload failed!",
+      error: err.message
+    }), { status: 500 });
   }
 };
