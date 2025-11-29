@@ -1,208 +1,33 @@
-/* ===============================
-   TEAHUG STYLE.CSS
-   TikTok-style vertical music feed
-   =============================== */
+/* RESET & BASE */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', sans-serif; }
+body { background: #111; color: #fff; overflow-x: hidden; }
 
-/* ==== RESET & BASE ==== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Helvetica Neue', sans-serif;
-}
-
-body {
-  background: #111; /* dark theme */
-  color: #fff;
-  overflow-x: hidden;
-}
-
-/* ==== POPUPS ==== */
+/* POPUPS */
 .popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
+  position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-  z-index: 100;
-  display: none;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  color: #fff;
+  background: #1a1a1a; padding: 20px;
+  border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+  z-index: 100; display: none; width: 90%; max-width: 400px; text-align: center; color: #fff;
 }
+.popup p, .popup h2, .popup h3 { margin-bottom: 10px; }
+.popup .close-btn { position: absolute; top: 8px; right: 12px; cursor: pointer; font-size: 18px; color: #fff; }
 
-.popup p, .popup h2, .popup h3 {
-  margin-bottom: 10px;
-}
+/* HEADER */
+header { position: fixed; top: 0; width: 100%; background: #111; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 50; border-bottom: 1px solid #333; }
+header button { background: #e6007e; color: #fff; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+#countdown { font-size: 14px; color: #f0f0f0; }
 
-.popup .close-btn {
-  position: absolute;
-  top: 8px;
-  right: 12px;
-  cursor: pointer;
-  font-size: 18px;
-  color: #fff;
-}
+/* SONG FEED */
+#songFeed { margin-top: 60px; display: flex; flex-direction: column; align-items: center; }
+.song-card { width: 90%; max-width: 350px; margin: 20px 0; position: relative; border-radius: 20px; overflow: hidden; background: #1a1a1a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.3s; }
+.song-card:hover { transform: scale(1.03); }
+.song-card img.song-img { width: 100%; display: block; border-radius: 20px; }
+.play-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: rgba(255,255,255,0.8); pointer-events: none; transition: all 0.3s; }
+.sendBtn { position: absolute; bottom: 10px; right: 10px; background: #e6007e; border: none; color: #fff; padding: 6px 14px; border-radius: 16px; font-weight: bold; cursor: pointer; z-index: 5; opacity: 0.9; }
+.sendBtn:hover { opacity: 1; }
 
-#introPopup {
-  display: block; /* shows on page load, will be hidden by JS after 5s */
-}
-
-/* ==== HEADER ==== */
-header {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: #111;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 50;
-  border-bottom: 1px solid #333;
-}
-
-header button {
-  background: #e6007e;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#countdown {
-  font-size: 14px;
-  color: #f0f0f0;
-}
-
-/* ==== SONG FEED ==== */
-#songFeed {
-  margin-top: 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.song-card {
-  width: 90%;
-  max-width: 350px;
-  margin: 20px 0;
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #1a1a1a;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-  cursor: pointer;
-  transition: transform 0.3s;
-}
-
-.song-card:hover {
-  transform: scale(1.03);
-}
-
-/* IMAGE & OVERLAY */
-.song-card img.song-img {
-  width: 100%;
-  display: block;
-  border-radius: 20px;
-}
-
-.play-overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 50px;
-  color: rgba(255,255,255,0.8);
-  pointer-events: none;
-  transition: all 0.3s;
-}
-
-/* SEND BUTTON */
-.sendBtn {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: #e6007e;
-  border: none;
-  color: #fff;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 5;
-  opacity: 0.9;
-}
-
-.sendBtn:hover {
-  opacity: 1;
-}
-
-/* ==== ADMIN SONG LIST ==== */
-.admin-song-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 8px;
-  background: #1a1a1a;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-}
-
-.admin-song-item img.admin-cover {
-  width: 60px;
-  height: 60px;
-  border-radius: 10px;
-  margin-right: 15px;
-  object-fit: cover;
-}
-
-.admin-song-item h3 {
-  margin-bottom: 5px;
-  font-size: 16px;
-}
-
-.admin-song-item p {
-  font-size: 14px;
-  color: #ccc;
-}
-
-audio {
-  width: 100%;
-  margin-top: 5px;
-}
-
-/* ==== FORM STYLING ==== */
-form {
-  background: #1a1a1a;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-  margin-bottom: 20px;
-}
-
-form input, form textarea, form button {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 12px;
-  border: none;
-}
-
-form button {
-  background: #e6007e;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
-}
-
-form button:hover {
-  opacity: 0.9;
-}
+/* FORM & ADMIN SONG LIST */
+textarea { width: 100%; height: 80px; padding: 10px; border-radius: 12px; border: none; margin-bottom: 10px; }
+button#sendMsgBtn { background: #e6007e; color: #fff; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
+button#sendMsgBtn:hover { opacity: 0.9; }
