@@ -24,12 +24,11 @@ const uploadForm = document.getElementById("uploadForm");
 const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
-// ⚠️ Use relative URL to Pages Function
-const R2_UPLOAD_URL = "https://e649bff25d83241bebe214ddd3beb656.pages.dev/api/upload";
+// ⚠️ Pages function URL
+const R2_UPLOAD_URL = "https://444220a9.teahug1.pages.dev/api/upload"; // Replace with your deployed Pages URL
 
-// Submit listener
 uploadForm.addEventListener("submit", async (e) => {
-  e.preventDefault(); // Stops page reload
+  e.preventDefault();
   adminStatus.textContent = "Uploading... Please wait.";
 
   const title = document.getElementById("songTitle").value.trim();
@@ -47,12 +46,8 @@ uploadForm.addEventListener("submit", async (e) => {
   formData.append("cover", coverFile);
 
   try {
-    const response = await fetch(R2_UPLOAD_URL, {
-      method: "POST",
-      body: formData
-    });
-
-    const uploaded = await response.json();
+    const res = await fetch(R2_UPLOAD_URL, { method: "POST", body: formData });
+    const uploaded = await res.json();
     console.log("Upload response:", uploaded);
 
     if (!uploaded.success) {
@@ -60,15 +55,12 @@ uploadForm.addEventListener("submit", async (e) => {
       return;
     }
 
-    const songURL = uploaded.songUrl;
-    const coverURL = uploaded.coverUrl;
-
-    // Save metadata to Firestore
+    // Save to Firestore
     await addDoc(collection(db, "songs"), {
       title,
       artist,
-      songURL,
-      coverURL,
+      songURL: uploaded.songUrl,
+      coverURL: uploaded.coverUrl,
       timestamp: Date.now()
     });
 
@@ -81,16 +73,14 @@ uploadForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Load all songs to display in admin
+// Load all songs
 async function loadSongs() {
   songList.innerHTML = "";
-
-  const querySnapshot = await getDocs(collection(db, "songs"));
-  querySnapshot.forEach((doc) => {
+  const snapshot = await getDocs(collection(db, "songs"));
+  snapshot.forEach((doc) => {
     const s = doc.data();
     const item = document.createElement("div");
     item.classList.add("admin-song-item");
-
     item.innerHTML = `
       <img src="${s.coverURL}" class="admin-cover"/>
       <div>
@@ -99,7 +89,6 @@ async function loadSongs() {
         <audio controls src="${s.songURL}"></audio>
       </div>
     `;
-
     songList.appendChild(item);
   });
 }
