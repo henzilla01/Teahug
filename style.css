@@ -20,6 +20,11 @@ body {
   height: 100vh; /* full viewport */
   width: 100%;
   /* ... other styling ... */
+   .song-card img {
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+   }
 }
 }
 
@@ -131,4 +136,5 @@ body {
   0% {opacity: 1;}
   100% {opacity: 0;}
 }
+
 
