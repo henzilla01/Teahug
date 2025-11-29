@@ -1,49 +1,43 @@
 export const config = {
-  runtime: "edge",
+  path: "/api/upload",
+  memory: "128MB"
 };
 
-export default async function handler(request) {
-  if (request.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
-  }
-
+export async function onRequestPost({ request, env }) {
   try {
-    const formData = await request.formData();
-    const songFile = formData.get("song");
-    const coverFile = formData.get("cover");
+    const MAX_SIZE = 8 * 1024 * 1024; // 8 MB per file
 
-    if (!songFile || !coverFile) {
-      return new Response(JSON.stringify({ success: false, message: "Files missing" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+    const formData = await request.formData();
+    const song = formData.get("song");
+    const cover = formData.get("cover");
+
+    if (!song || !cover) {
+      return new Response(JSON.stringify({ success: false, error: "Missing files" }), { status: 400 });
     }
 
-    // Access R2 bucket
-    const BUCKET = teahug; // variable from Pages binding
-    const BUCKET_DOMAIN = https://e649bff25d83241bebe214ddd3beb656.r2.cloudflarestorage.com; // variable from env
+    if (song.size > MAX_SIZE || cover.size > MAX_SIZE) {
+      return new Response(JSON.stringify({ success: false, error: "File too large" }), { status: 413 });
+    }
 
-    // Save song
-    const songKey = `songs/${songFile.name}`;
-    await BUCKET.put(songKey, songFile.stream());
+    // Upload to R2 bucket
+    const songKey = `songs/${song.name}`;
+    const coverKey = `covers/${cover.name}`;
 
-    // Save cover
-    const coverKey = `covers/${coverFile.name}`;
-    await BUCKET.put(coverKey, coverFile.stream());
+    await env.TEAHUG1.put(songKey, await song.arrayBuffer(), {
+      httpMetadata: { contentType: song.type }
+    });
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        songUrl: `${BUCKET_DOMAIN}/${songKey}`,
-        coverUrl: `${BUCKET_DOMAIN}/${coverKey}`,
-      }),
-      { status: 200, headers: { "Content-Type": "application/json" } }
-    );
+    await env.TEAHUG1.put(coverKey, await cover.arrayBuffer(), {
+      httpMetadata: { contentType: cover.type }
+    });
+
+    return new Response(JSON.stringify({
+      success: true,
+      songUrl: `https://pub-83823864dc904706888338cd05e3b128.r2.dev/${songKey}`,
+      coverUrl: `https://pub-83823864dc904706888338cd05e3b128.r2.dev/${coverKey}`
+    }));
   } catch (err) {
     console.error(err);
-    return new Response(
-      JSON.stringify({ success: false, message: err.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    return new Response(JSON.stringify({ success: false, error: err.message }), { status: 500 });
   }
 }
