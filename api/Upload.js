@@ -20,8 +20,8 @@ export default async function handler(request) {
     }
 
     // Access R2 bucket
-    const BUCKET = R2_BUCKET; // variable from Pages binding
-    const BUCKET_DOMAIN = R2_BUCKET_DOMAIN; // variable from env
+    const BUCKET = teahug; // variable from Pages binding
+    const BUCKET_DOMAIN = https://e649bff25d83241bebe214ddd3beb656.r2.cloudflarestorage.com; // variable from env
 
     // Save song
     const songKey = `songs/${songFile.name}`;
