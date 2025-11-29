@@ -1,33 +1,128 @@
-/* RESET & BASE */
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', sans-serif; }
-body { background: #111; color: #fff; overflow-x: hidden; }
-
-/* POPUPS */
-.popup {
-  position: fixed; top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  background: #1a1a1a; padding: 20px;
-  border-radius: 12px; box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-  z-index: 100; display: none; width: 90%; max-width: 400px; text-align: center; color: #fff;
+/* ===============================
+   GENERAL STYLES
+   =============================== */
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #121212;
+  color: #fff;
+  overflow-x: hidden;
 }
-.popup p, .popup h2, .popup h3 { margin-bottom: 10px; }
-.popup .close-btn { position: absolute; top: 8px; right: 12px; cursor: pointer; font-size: 18px; color: #fff; }
 
-/* HEADER */
-header { position: fixed; top: 0; width: 100%; background: #111; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 50; border-bottom: 1px solid #333; }
-header button { background: #e6007e; color: #fff; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-#countdown { font-size: 14px; color: #f0f0f0; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #1f1f1f;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-/* SONG FEED */
-#songFeed { margin-top: 60px; display: flex; flex-direction: column; align-items: center; }
-.song-card { width: 90%; max-width: 350px; margin: 20px 0; position: relative; border-radius: 20px; overflow: hidden; background: #1a1a1a; box-shadow: 0 4px 15px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.3s; }
-.song-card:hover { transform: scale(1.03); }
-.song-card img.song-img { width: 100%; display: block; border-radius: 20px; }
-.play-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: rgba(255,255,255,0.8); pointer-events: none; transition: all 0.3s; }
-.sendBtn { position: absolute; bottom: 10px; right: 10px; background: #e6007e; border: none; color: #fff; padding: 6px 14px; border-radius: 16px; font-weight: bold; cursor: pointer; z-index: 5; opacity: 0.9; }
-.sendBtn:hover { opacity: 1; }
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
 
-/* FORM & ADMIN SONG LIST */
-textarea { width: 100%; height: 80px; padding: 10px; border-radius: 12px; border: none; margin-bottom: 10px; }
-button#sendMsgBtn { background: #e6007e; color: #fff; padding: 10px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; width: 100%; }
-button#sendMsgBtn:hover { opacity: 0.9; }
+header button {
+  background: #ff0050;
+  border: none;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* ===============================
+   POPUPS
+   =============================== */
+.popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #1f1f1f;
+  border: 2px solid #ff0050;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  z-index: 100;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup textarea {
+  width: 100%;
+  height: 80px;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: none;
+}
+
+/* ===============================
+   SONG FEED (TikTok-style)
+   =============================== */
+#songFeed {
+  display: flex;
+  flex-direction: column;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: calc(100vh - 60px);
+}
+
+.song-card {
+  scroll-snap-align: start;
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #222;
+}
+
+.song-img {
+  width: 90%;
+  max-height: 70%;
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #ff0050;
+}
+
+.play-overlay {
+  position: absolute;
+  font-size: 4rem;
+  color: #fff;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+/* Send button */
+.sendBtn {
+  position: absolute;
+  bottom: 20%;
+  right: 10%;
+  background: #ff0050;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* ===============================
+   COUNTDOWN
+   =============================== */
+.countdown {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem;
+  background-color: #1f1f1f;
+  border-top: 2px solid #ff0050;
+}
