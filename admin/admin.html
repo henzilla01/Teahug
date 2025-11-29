@@ -2,33 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TeaHug Admin</title>
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <h1>TeaHug Admin Panel</h1>
-
-  <!-- UPLOAD FORM -->
+  <h2>TeaHug Admin</h2>
   <form id="uploadForm">
-    <label>Song Title:</label>
-    <input type="text" id="songTitle" required>
-    <label>Artist:</label>
-    <input type="text" id="songArtist" required>
-    <label>Song File (MP3):</label>
+    <input type="text" id="songTitle" placeholder="Song Title" required>
+    <input type="text" id="songArtist" placeholder="Artist" required>
     <input type="file" id="songFile" accept=".mp3" required>
-    <label>Cover Image:</label>
     <input type="file" id="coverFile" accept="image/*" required>
     <button type="submit">Upload Song</button>
   </form>
-  <p id="adminStatus"></p>
 
-  <!-- SONG LIST -->
-  <h2>All Songs</h2>
+  <div id="adminStatus"></div>
   <div id="songList"></div>
 
-  <!-- FIREBASE + ADMIN JS -->
   <script type="module" src="admin.js"></script>
 </body>
 </html>
