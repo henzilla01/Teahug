@@ -33,12 +33,13 @@ let audioPlayers = [];
 // Intro popup auto-hide (5 sec)
 setTimeout(() => introPopup.classList.add("hidden"), 5000);
 
-// About popup
+// Show About popup only when About button is clicked
 aboutBtn.addEventListener("click", () => {
   aboutPopup.classList.remove("hidden");
 });
-window.closeAbout = () => aboutPopup.classList.add("hidden");
 
+// Function to close About popup
+window.closeAbout = () => aboutPopup.classList.add("hidden");
 // Message popup
 window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
@@ -171,3 +172,4 @@ setInterval(updateCountdown, 1000);
 // Start everything
 loadSongs();
 updateCountdown();
+
