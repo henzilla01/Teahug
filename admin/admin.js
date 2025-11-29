@@ -25,7 +25,7 @@ const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
 // ⚠️ Use relative URL to Pages Function
-const R2_UPLOAD_URL = "https://teahug1.pages.dev/api/upload";
+const R2_UPLOAD_URL = "https://pub-bf38f9589fd44fdc8fd0388dcd8eeba5.r2.dev";
 
 // Submit listener
 uploadForm.addEventListener("submit", async (e) => {
