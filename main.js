@@ -18,6 +18,7 @@ const db = getFirestore(app);
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const aboutPopup = document.getElementById("aboutPopup");
+const aboutBtn = document.getElementById("aboutBtn");
 const messagePopup = document.getElementById("messagePopup");
 const songTitleEl = document.getElementById("songTitle");
 const userMsgInput = document.getElementById("userMessage");
@@ -28,23 +29,21 @@ let currentIndex = 0;
 let songElements = [];
 let audioPlayers = [];
 
-// Intro popup auto-hide
+// Intro popup auto-hide (5s)
 setTimeout(() => introPopup.classList.add("hidden"), 5000);
 
-// Load songs from Firestore
+// About popup
+aboutBtn.addEventListener("click", () => aboutPopup.classList.toggle("hidden"));
+
+// Load songs
 async function loadSongs() {
-  const querySnapshot = await getDocs(collection(db, "songs"));
-  allSongs = [];
-
-  querySnapshot.forEach(doc => {
-    allSongs.push(doc.data());
-  });
-
+  const snapshot = await getDocs(collection(db, "songs"));
+  allSongs = snapshot.docs.map(doc => doc.data());
   buildFeed();
   playSong(0);
 }
 
-// Build TikTok-style feed
+// Build feed
 function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
@@ -66,21 +65,20 @@ function buildFeed() {
     audioPlayers.push(audio);
     songElements.push(card);
 
-    // Play/pause toggle
+    // Play/pause overlay
     const overlay = card.querySelector(".play-overlay");
     card.addEventListener("click", () => {
       if (audio.paused) {
         audio.play();
-        overlay.style.display = "none";
+        overlay.style.opacity = 0;
       } else {
         audio.pause();
-        overlay.style.display = "block";
+        overlay.style.opacity = 1;
       }
     });
 
     // Send button
-    const sendBtn = card.querySelector(".sendBtn");
-    sendBtn.addEventListener("click", () => openMessageForm(song));
+    card.querySelector(".sendBtn").addEventListener("click", () => openMessageForm(song));
 
     songFeed.appendChild(card);
   });
@@ -90,22 +88,17 @@ function buildFeed() {
 
 // Swipe navigation
 let startY = 0;
-let endY = 0;
-
 function enableSwipe() {
   songFeed.addEventListener("touchstart", e => startY = e.touches[0].clientY);
   songFeed.addEventListener("touchend", e => {
-    endY = e.changedTouches[0].clientY;
+    const endY = e.changedTouches[0].clientY;
     if (startY - endY > 50) nextSong();
     if (endY - startY > 50) prevSong();
   });
 }
 
 function stopAll() {
-  audioPlayers.forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
+  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
 }
 
 function playSong(i) {
@@ -138,7 +131,7 @@ function openMessageForm(song) {
     const msg = userMsgInput.value.trim();
     if (!msg) return alert("Please type a message");
 
-    // Call worker endpoint here
+    // Call your worker endpoint here
     await fetch("https://teahug.workers.dev/send", {
       method: "POST",
       body: JSON.stringify({ title: song.title, message: msg })
@@ -149,9 +142,7 @@ function openMessageForm(song) {
   };
 }
 
-window.closeMessageForm = function () {
-  messagePopup.classList.add("hidden");
-};
+window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
 // Start
 loadSongs();
