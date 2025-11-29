@@ -1,175 +1,180 @@
-﻿/* === GLOBAL RESET === */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Inter", sans-serif;
-}
+/* ===============================
+   TEAHUG PUBLIC PAGE CSS
+   TikTok-style swipe feed + Popups
+   =============================== */
 
+/* ==== GLOBAL STYLES ==== */
 body {
-  background: #000;
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #000;
   color: #fff;
-  overflow: hidden;
-  height: 100vh;
+  overflow-x: hidden;
 }
 
-/* === POPUPS === */
-.popup {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0, 0, 0, 0.75);
+.hidden {
+  display: none !important;
+}
+
+/* ==== SONG FEED ==== */
+#songFeed {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  z-index: 999;
-  opacity: 1;
-  transition: opacity 0.4s ease;
-}
-
-.popup.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.popup-box {
-  background: #111;
-  padding: 25px;
-  width: 85%;
-  max-width: 420px;
-  border-radius: 12px;
-  text-align: center;
-  border: 1px solid #333;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
-}
-
-.popup-box h2 {
-  font-size: 24px;
-  margin-bottom: 12px;
-}
-
-.popup-box p, .popup-box ol {
-  font-size: 15px;
-  margin: 8px 0;
-  line-height: 1.4;
-}
-
-.popup-box button {
-  background: #0ff;
-  color: #000;
-  margin-top: 15px;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* === TOP BAR === */
-.topBar {
-  position: fixed;
-  top: 10px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 15px;
-  z-index: 10;
-}
-
-#aboutBtn {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #333;
-  color: white;
-}
-
-#countdown {
-  font-size: 14px;
-  background: rgba(0, 255, 255, 0.15);
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #044;
-}
-
-/* === SONG FEED === */
-.song-feed {
-  position: relative;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  padding: 20px 0;
 }
 
 .song-card {
   position: relative;
-  height: 100vh;
-  width: 100%;
-  scroll-snap-align: start;
+  width: 90%;
+  max-width: 400px;
+  height: 500px;
+  margin: 20px 0;
+  border-radius: 20px;
   overflow: hidden;
+  background-color: #111;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: transform 0.3s ease;
+}
+
+.song-card:hover {
+  transform: scale(1.02);
 }
 
 .song-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(70%);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
-/* === PLAYER OVERLAY === */
+.song-info {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  padding: 15px;
+  color: #fff;
+}
+
+.song-info h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.song-info p {
+  margin: 5px 0 0 0;
+  font-size: 1rem;
+  color: #ddd;
+}
+
+/* Play overlay in the middle */
 .play-overlay {
   position: absolute;
-  top: 50%; 
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 70px;
-  opacity: 0.7;
-  color: cyan;
-  display: none;
+  font-size: 3rem;
+  color: #fff;
+  z-index: 2;
+  pointer-events: none;
 }
 
-/* === SEND BUTTON ON EACH SONG === */
+/* Send button */
 .sendBtn {
   position: absolute;
-  bottom: 80px;
+  bottom: 20px;
   right: 20px;
-  background: linear-gradient(135deg, #0ff, #80f);
-  padding: 12px 20px;
+  z-index: 3;
+  background-color: #ff4081;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+  transition: transform 0.2s;
+}
+
+.sendBtn:hover {
+  transform: scale(1.1);
+}
+
+/* ==== POPUPS ==== */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #111;
+  padding: 20px;
   border-radius: 15px;
-  font-weight: bold;
-  border: none;
-  font-size: 15px;
-  cursor: pointer;
-  color: #000;
-  box-shadow: 0 0 15px rgba(0,255,255,0.4);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+  z-index: 999;
+  width: 90%;
+  max-width: 400px;
 }
 
-/* === MESSAGE FORM === */
-textarea {
+.popup h2 {
+  margin-top: 0;
+  color: #ff4081;
+}
+
+.popup button {
+  margin-top: 15px;
+  background-color: #ff4081;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.popup button:hover {
+  opacity: 0.9;
+}
+
+/* ==== COUNTDOWN ==== */
+#countdown {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 1.2rem;
+  color: #ff4081;
+}
+
+/* ==== AUDIO PLAYER STYLING ==== */
+audio {
   width: 100%;
-  height: 120px;
-  padding: 10px;
-  background: #000;
-  border: 1px solid #444;
-  color: cyan;
-  border-radius: 8px;
   outline: none;
+  margin-top: 10px;
+  border-radius: 10px;
 }
 
-#sendMsgBtn {
-  background: #0ff;
-  color: #000;
-  width: 100%;
-  padding: 10px;
-  font-weight: bold;
-  margin-top: 8px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
+/* ==== RESPONSIVE ==== */
+@media screen and (max-width: 500px) {
+  .song-card {
+    height: 400px;
+  }
 
-/* === SWIPE ANIMATION (smooth TikTok feel) === */
-.song-card {
-  transition: transform 0.35s ease-out;
+  .song-info h3 {
+    font-size: 1.2rem;
+  }
+
+  .song-info p {
+    font-size: 0.9rem;
+  }
+
+  .play-overlay {
+    font-size: 2.5rem;
+  }
+
+  .sendBtn {
+    padding: 8px 15px;
+  }
 }
