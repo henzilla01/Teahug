@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ==== FIREBASE CONFIG ==== */
+// 🔹 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -14,68 +14,37 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ==== DOM ELEMENTS ==== */
+// DOM Elements
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const aboutPopup = document.getElementById("aboutPopup");
-const aboutBtn = document.getElementById("aboutBtn");
 const messagePopup = document.getElementById("messagePopup");
 const songTitleEl = document.getElementById("songTitle");
 const userMsgInput = document.getElementById("userMessage");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
-const countdownEl = document.getElementById("countdown");
 
 let allSongs = [];
 let currentIndex = 0;
 let songElements = [];
 let audioPlayers = [];
 
-/* ===============================
-   INTRO POPUP AUTO-HIDE (5 sec)
-   =============================== */
+// Intro popup auto-hide
 setTimeout(() => introPopup.classList.add("hidden"), 5000);
 
-/* ===============================
-   ABOUT POPUP
-   =============================== */
-aboutBtn.addEventListener("click", () => {
-  aboutPopup.classList.remove("hidden");
-});
-
-window.closeAbout = function () {
-  aboutPopup.classList.add("hidden");
-};
-
-/* ===============================
-   MESSAGE POPUP
-   =============================== */
-window.closeMessageForm = function () {
-  messagePopup.classList.add("hidden");
-};
-
-/* ===============================
-   LOAD SONGS FROM FIRESTORE
-   =============================== */
+// Load songs from Firestore
 async function loadSongs() {
-  const snapshot = await getDocs(collection(db, "songs"));
-  snapshot.forEach(doc => allSongs.push({ id: doc.id, ...doc.data() }));
+  const querySnapshot = await getDocs(collection(db, "songs"));
+  allSongs = [];
 
-  shuffleSongs();
+  querySnapshot.forEach(doc => {
+    allSongs.push(doc.data());
+  });
+
   buildFeed();
   playSong(0);
 }
 
-/* ==== SHUFFLE SONGS ==== */
-function shuffleSongs() {
-  for (let i = allSongs.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
-  }
-}
-
-/* ===============================
-   BUILD TIKTOK-STYLE FEED
-   =============================== */
+// Build TikTok-style feed
 function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
@@ -97,20 +66,21 @@ function buildFeed() {
     audioPlayers.push(audio);
     songElements.push(card);
 
-    /* SEND BUTTON */
-    card.querySelector(".sendBtn").onclick = () => openMessageForm(song);
-
-    /* TAP TO PLAY/PAUSE */
-    const playOverlay = card.querySelector(".play-overlay");
+    // Play/pause toggle
+    const overlay = card.querySelector(".play-overlay");
     card.addEventListener("click", () => {
       if (audio.paused) {
         audio.play();
-        playOverlay.style.display = "none";
+        overlay.style.display = "none";
       } else {
         audio.pause();
-        playOverlay.style.display = "block";
+        overlay.style.display = "block";
       }
     });
+
+    // Send button
+    const sendBtn = card.querySelector(".sendBtn");
+    sendBtn.addEventListener("click", () => openMessageForm(song));
 
     songFeed.appendChild(card);
   });
@@ -118,44 +88,17 @@ function buildFeed() {
   enableSwipe();
 }
 
-/* ===============================
-   SWIPE NAVIGATION
-   =============================== */
-function enableSwipe() {
-  let startY = 0;
-  let endY = 0;
+// Swipe navigation
+let startY = 0;
+let endY = 0;
 
+function enableSwipe() {
   songFeed.addEventListener("touchstart", e => startY = e.touches[0].clientY);
   songFeed.addEventListener("touchend", e => {
     endY = e.changedTouches[0].clientY;
-    if (startY - endY > 80) nextSong();
-    if (endY - startY > 80) prevSong();
+    if (startY - endY > 50) nextSong();
+    if (endY - startY > 50) prevSong();
   });
-}
-
-function nextSong() {
-  stopAll();
-  currentIndex++;
-  if (currentIndex >= songElements.length) currentIndex = 0;
-  scrollToSong(currentIndex);
-  playSong(currentIndex);
-}
-
-function prevSong() {
-  stopAll();
-  currentIndex--;
-  if (currentIndex < 0) currentIndex = songElements.length - 1;
-  scrollToSong(currentIndex);
-  playSong(currentIndex);
-}
-
-function scrollToSong(i) {
-  songElements[i].scrollIntoView({ behavior: "smooth" });
-}
-
-function playSong(i) {
-  stopAll();
-  audioPlayers[i].play();
 }
 
 function stopAll() {
@@ -165,61 +108,50 @@ function stopAll() {
   });
 }
 
-/* ===============================
-   MESSAGE FORM
-   =============================== */
+function playSong(i) {
+  stopAll();
+  audioPlayers[i].play();
+}
+
+function scrollToSong(i) {
+  songElements[i].scrollIntoView({ behavior: "smooth" });
+}
+
+function nextSong() {
+  currentIndex = (currentIndex + 1) % songElements.length;
+  scrollToSong(currentIndex);
+  playSong(currentIndex);
+}
+
+function prevSong() {
+  currentIndex = (currentIndex - 1 + songElements.length) % songElements.length;
+  scrollToSong(currentIndex);
+  playSong(currentIndex);
+}
+
+// Message popup
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
 
-  sendMsgBtn.onclick = () => sendMessage(song);
-}
+  sendMsgBtn.onclick = async () => {
+    const msg = userMsgInput.value.trim();
+    if (!msg) return alert("Please type a message");
 
-/* ===============================
-   SEND MESSAGE FUNCTION (placeholder)
-   =============================== */
-async function sendMessage(song) {
-  const message = userMsgInput.value.trim();
-  if (!message) return alert("Type a message.");
+    // Call worker endpoint here
+    await fetch("https://teahug.workers.dev/send", {
+      method: "POST",
+      body: JSON.stringify({ title: song.title, message: msg })
+    });
 
-  // Example: send to worker endpoint
-  const res = await fetch("https://teahug.workers.dev/send", {
-    method: "POST",
-    body: JSON.stringify({ title: song.title, message })
-  });
-
-  if (res.ok) {
-    alert("Message sent ❤️");
     messagePopup.classList.add("hidden");
     userMsgInput.value = "";
-  } else {
-    alert("Failed to send message.");
-  }
+  };
 }
 
-/* ===============================
-   COUNTDOWN TO HUG HOUR
-   =============================== */
-function updateCountdown() {
-  const now = new Date();
-  let target = new Date();
-  target.setHours(21, 0, 0, 0);
+window.closeMessageForm = function () {
+  messagePopup.classList.add("hidden");
+};
 
-  if (now.getHours() >= 21) {
-    countdownEl.textContent = "Hug Hour Active ❤️";
-    return;
-  }
-
-  const diff = target - now;
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  countdownEl.textContent = `${h}h ${m}m to Hug Hour`;
-}
-
-setInterval(updateCountdown, 1000);
-
-/* ===============================
-   INIT
-   =============================== */
+// Start
 loadSongs();
-updateCountdown();
