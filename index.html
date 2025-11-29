@@ -2,42 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeaHug Music Feed</title>
+  <title>TeaHug</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- HEADER -->
+  <header>
+    <div id="countdown">Loading Hug Hour...</div>
+    <button id="aboutBtn">About</button>
+  </header>
+
+  <!-- SONG FEED -->
+  <div id="songFeed"></div>
 
   <!-- INTRO POPUP -->
   <div id="introPopup" class="popup">
-    <p>Welcome to TeaHug! Enjoy the music ❤️</p>
+    <p>Welcome to TeaHug! Enjoy the music and send your hugs ❤️</p>
   </div>
 
   <!-- ABOUT POPUP -->
   <div id="aboutPopup" class="popup">
-    <span class="close-btn" onclick="closeAbout()">✖</span>
+    <span class="close-btn" onclick="closeAbout()">×</span>
     <h2>About TeaHug</h2>
-    <p>A fun way to send musical hugs!</p>
+    <p>This platform allows you to send music + messages to your friends!</p>
   </div>
 
   <!-- MESSAGE POPUP -->
   <div id="messagePopup" class="popup">
-    <span class="close-btn" onclick="closeMessageForm()">✖</span>
+    <span class="close-btn" onclick="closeMessageForm()">×</span>
     <h3 id="songTitle">Song Title</h3>
-    <textarea id="userMessage" rows="4" placeholder="Type your message here..."></textarea>
-    <button id="sendMsgBtn">Send</button>
+    <textarea id="userMessage" placeholder="Write your message here"></textarea>
+    <button id="sendMsgBtn">Send Message</button>
   </div>
 
-  <!-- HEADER -->
-  <header>
-    <button id="aboutBtn">About</button>
-    <div id="countdown"></div>
-  </header>
-
-  <!-- SONG FEED -->
-  <main id="songFeed"></main>
-
-  <!-- SCRIPTS -->
   <script type="module" src="main.js"></script>
 </body>
 </html>
