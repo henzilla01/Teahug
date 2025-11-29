@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-// 🔹 Firebase config
+/* ===== FIREBASE CONFIG ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -14,39 +14,30 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM Elements
+/* ===== DOM ===== */
 const songFeed = document.getElementById("songFeed");
-const introPopup = document.getElementById("introPopup");
-const aboutPopup = document.getElementById("aboutPopup");
-const aboutBtn = document.getElementById("aboutBtn");
 const messagePopup = document.getElementById("messagePopup");
 const songTitleEl = document.getElementById("songTitle");
 const userMsgInput = document.getElementById("userMessage");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
+const aboutPopup = document.getElementById("aboutPopup");
+const aboutBtn = document.getElementById("aboutBtn");
 
 let allSongs = [];
 let currentIndex = 0;
-let songElements = [];
 let audioPlayers = [];
 
-// Intro popup auto-hide (5s)
-setTimeout(() => introPopup.classList.add("hidden"), 5000);
-
-// About popup
-aboutBtn.addEventListener("click", () => aboutPopup.classList.toggle("hidden"));
-
-// Load songs
+/* ===== LOAD SONGS ===== */
 async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
-  allSongs = snapshot.docs.map(doc => doc.data());
+  snapshot.forEach(doc => allSongs.push({ id: doc.id, ...doc.data() }));
   buildFeed();
-  playSong(0);
 }
+loadSongs();
 
-// Build feed
+/* ===== BUILD TIKTOK FEED ===== */
 function buildFeed() {
   songFeed.innerHTML = "";
-  songElements = [];
   audioPlayers = [];
 
   allSongs.forEach((song, index) => {
@@ -55,96 +46,94 @@ function buildFeed() {
 
     card.innerHTML = `
       <img src="${song.coverURL}" class="song-img">
-      <div class="play-overlay">▶</div>
-      <button class="sendBtn">Send</button>
+      <div class="overlay">
+        <h3>${song.title}</h3>
+        <p>${song.artist}</p>
+        <button class="sendBtn">Send ❤️</button>
+      </div>
     `;
 
     const audio = new Audio(song.songURL);
     audio.loop = true;
-
     audioPlayers.push(audio);
-    songElements.push(card);
 
-    // Play/pause overlay
-    const overlay = card.querySelector(".play-overlay");
-    card.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        overlay.style.opacity = 0;
-      } else {
-        audio.pause();
-        overlay.style.opacity = 1;
-      }
+    card.querySelector(".sendBtn").addEventListener("click", (e) => {
+      e.stopPropagation();
+      openMessageForm(song);
     });
 
-    // Send button
-    card.querySelector(".sendBtn").addEventListener("click", () => openMessageForm(song));
+    card.addEventListener("click", () => togglePlay(index));
 
     songFeed.appendChild(card);
-    songFeed.scrollTo(0, 0);
   });
 
-  enableSwipe();
+  enableFullPageScroll();
 }
 
-// Swipe navigation
-let startY = 0;
-function enableSwipe() {
+/* ===== PLAY/PAUSE AUDIO ===== */
+function togglePlay(index) {
+  audioPlayers.forEach((a, i) => {
+    if (i === index) {
+      a.paused ? a.play() : a.pause();
+    } else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  });
+}
+
+/* ===== FULL-PAGE VERTICAL SCROLL ===== */
+function enableFullPageScroll() {
+  let startY = 0;
   songFeed.addEventListener("touchstart", e => startY = e.touches[0].clientY);
   songFeed.addEventListener("touchend", e => {
     const endY = e.changedTouches[0].clientY;
-    if (startY - endY > 50) nextSong();
-    if (endY - startY > 50) prevSong();
+    if (startY - endY > 50) scrollNext();
+    if (endY - startY > 50) scrollPrev();
   });
 }
 
-function stopAll() {
-  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
-}
-
-function playSong(i) {
-  stopAll();
-  audioPlayers[i].play();
-}
-
-function scrollToSong(i) {
-  songElements[i].scrollIntoView({ behavior: "smooth" });
-}
-
-function nextSong() {
-  currentIndex = (currentIndex + 1) % songElements.length;
+function scrollNext() {
+  if (currentIndex < allSongs.length - 1) currentIndex++;
   scrollToSong(currentIndex);
-  playSong(currentIndex);
 }
 
-function prevSong() {
-  currentIndex = (currentIndex - 1 + songElements.length) % songElements.length;
+function scrollPrev() {
+  if (currentIndex > 0) currentIndex--;
   scrollToSong(currentIndex);
-  playSong(currentIndex);
 }
 
-// Message popup
+function scrollToSong(index) {
+  const cards = document.querySelectorAll(".song-card");
+  cards[index].scrollIntoView({ behavior: "smooth" });
+  audioPlayers.forEach((a, i) => { if (i !== index) { a.pause(); a.currentTime = 0; } });
+}
+
+/* ===== MESSAGE POPUP ===== */
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
 
   sendMsgBtn.onclick = async () => {
-    const msg = userMsgInput.value.trim();
-    if (!msg) return alert("Please type a message");
+    const message = userMsgInput.value.trim();
+    if (!message) return alert("Type a message first!");
 
-    // Call your worker endpoint here
-    await fetch("https://teahug.workers.dev/send", {
-      method: "POST",
-      body: JSON.stringify({ title: song.title, message: msg })
-    });
-
-    messagePopup.classList.add("hidden");
-    userMsgInput.value = "";
+    try {
+      await fetch("https://teahug.workers.dev/send", {
+        method: "POST",
+        body: JSON.stringify({ title: song.title, message }),
+      });
+      alert("Hug sent! ❤️");
+      userMsgInput.value = "";
+      messagePopup.classList.add("hidden");
+    } catch {
+      alert("Failed to send message.");
+    }
   };
 }
 
 window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
-// Start
-loadSongs();
-
+/* ===== ABOUT POPUP ===== */
+aboutBtn.addEventListener("click", () => aboutPopup.classList.remove("hidden"));
+window.closeAbout = () => aboutPopup.classList.add("hidden");
