@@ -7,6 +7,20 @@ body {
   background-color: #000;
   color: #fff;
   overflow: hidden;
+  margin: 0;
+  overflow: hidden; /* prevent double scrollbars */
+}
+#feedContainer {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+#songFeed .song-card {
+  scroll-snap-align: start;
+  height: 100vh; /* full viewport */
+  width: 100%;
+  /* ... other styling ... */
+}
 }
 
 #songFeed {
@@ -117,3 +131,4 @@ body {
   0% {opacity: 1;}
   100% {opacity: 0;}
 }
+
