@@ -1,27 +1,34 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-// 🔹 Firebase config
+// 🔹 Firebase config from .env or directly
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
   projectId: "joinhugparty",
-  storageBucket: "joinhugparty.appspot.com",
+  storageBucket: "joinhugparty.firebasestorage.app",
   messagingSenderId: "540501854830",
   appId: "1:540501854830:web:7249bb97b50582fe97747f"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
-// DOM Elements
+// 🔹 DOM Elements
 const uploadForm = document.getElementById("uploadForm");
 const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
-// Upload handler
+// 🔹 Cloudinary config
+const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/dmi3n8io4/upload`;
+const CLOUDINARY_UPLOAD_PRESET = "Teahug";
+
+// Upload listener
 uploadForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   adminStatus.textContent = "Uploading... Please wait.";
@@ -37,23 +44,35 @@ uploadForm.addEventListener("submit", async (e) => {
   }
 
   try {
-    // Upload song
-    const songRef = ref(storage, `songs/${songFile.name}`);
-    await uploadBytes(songRef, songFile);
-    const songURL = await getDownloadURL(songRef);
+    // Upload song to Cloudinary
+    const songData = new FormData();
+    songData.append("file", songFile);
+    songData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-    // Upload cover
-    const coverRef = ref(storage, `covers/${coverFile.name}`);
-    await uploadBytes(coverRef, coverFile);
-    const coverURL = await getDownloadURL(coverRef);
+    const songRes = await fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: songData,
+    });
+    const songResult = await songRes.json();
 
-    // Save metadata in Firestore
+    // Upload cover to Cloudinary
+    const coverData = new FormData();
+    coverData.append("file", coverFile);
+    coverData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+
+    const coverRes = await fetch(CLOUDINARY_URL, {
+      method: "POST",
+      body: coverData,
+    });
+    const coverResult = await coverRes.json();
+
+    // Save metadata to Firestore
     await addDoc(collection(db, "songs"), {
       title,
       artist,
-      songURL,
-      coverURL,
-      timestamp: Date.now()
+      songURL: songResult.secure_url,
+      coverURL: coverResult.secure_url,
+      timestamp: Date.now(),
     });
 
     adminStatus.textContent = "Song added successfully!";
@@ -61,16 +80,16 @@ uploadForm.addEventListener("submit", async (e) => {
     loadSongs();
   } catch (err) {
     console.error(err);
-    adminStatus.textContent = "Upload failed! Check console for errors.";
+    adminStatus.textContent = "Upload failed! Check console.";
   }
 });
 
 // Load all songs for admin view
 async function loadSongs() {
   songList.innerHTML = "";
-  const querySnapshot = await getDocs(collection(db, "songs"));
 
-  querySnapshot.forEach(doc => {
+  const querySnapshot = await getDocs(collection(db, "songs"));
+  querySnapshot.forEach((doc) => {
     const s = doc.data();
     const item = document.createElement("div");
     item.classList.add("admin-song-item");
@@ -83,6 +102,7 @@ async function loadSongs() {
         <audio controls src="${s.songURL}"></audio>
       </div>
     `;
+
     songList.appendChild(item);
   });
 }
