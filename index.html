@@ -1,60 +1,43 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teahug</title>
+  <title>TeaHug Music Feed</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
   <!-- INTRO POPUP -->
   <div id="introPopup" class="popup">
-    <div class="popup-box">
-      <h2>TeaHug</h2>
-      <p>Set the MOOD with SURPRISES... not MESSAGES</p>
-      <p>Pick a song vibe. Set the mood. We deliver the surprise during nightly Hug Hours.</p>
-      <p><b>Free • No Signup • Just Good Vibes</b></p>
-    </div>
+    <p>Welcome to TeaHug! Enjoy the music ❤️</p>
   </div>
 
   <!-- ABOUT POPUP -->
   <div id="aboutPopup" class="popup">
-    <div class="popup-box">
-      <h2>About Teahug 🫖</h2>
-      <p>"Set the MOOD with SURPRISES... not MESSAGES"</p>
-      <p>Teahug turns your favorite songs into emotional surprises. Pick a 15-second snippet, choose your vibe, express your feelings and we'll deliver it as a beautiful surprise.</p>
-      <p><b>How it works:</b></p>
-      <ol>
-        <li>Choose a song</li>
-        <li>Write your message</li>
-        <li>We deliver it during Hug Hour (9PM–12AM)</li>
-      </ol>
-      <button onclick="closeAbout()">Close</button>
-    </div>
+    <span class="close-btn" onclick="closeAbout()">✖</span>
+    <h2>About TeaHug</h2>
+    <p>A fun way to send musical hugs!</p>
   </div>
 
-  <!-- TOP BAR -->
-  <div class="topBar">
+  <!-- MESSAGE POPUP -->
+  <div id="messagePopup" class="popup">
+    <span class="close-btn" onclick="closeMessageForm()">✖</span>
+    <h3 id="songTitle">Song Title</h3>
+    <textarea id="userMessage" rows="4" placeholder="Type your message here..."></textarea>
+    <button id="sendMsgBtn">Send</button>
+  </div>
+
+  <!-- HEADER -->
+  <header>
     <button id="aboutBtn">About</button>
     <div id="countdown"></div>
-  </div>
+  </header>
 
-  <!-- SONG FEED CONTAINER -->
-  <div id="songFeed" class="song-feed"></div>
+  <!-- SONG FEED -->
+  <main id="songFeed"></main>
 
-  <!-- MESSAGE FORM POPUP -->
-  <div id="messagePopup" class="popup">
-    <div class="popup-box">
-      <h2 id="songTitle"></h2>
-      <textarea id="userMessage" placeholder="Type your message..."></textarea>
-      <button id="sendMsgBtn">Send</button>
-      <button onclick="closeMessageForm()">Cancel</button>
-    </div>
-  </div>
-
+  <!-- SCRIPTS -->
   <script type="module" src="main.js"></script>
-
 </body>
 </html>
