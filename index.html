@@ -2,38 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TeaHug</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- HEADER -->
+
+  <!-- Intro popup (visible on page load for 5s) -->
+  <div id="introPopup" class="popup">Welcome to TeaHug 🎵</div>
+
+  <!-- About popup (visible only on button click) -->
+  <div id="aboutPopup" class="popup hidden">
+    <h2>About TeaHug</h2>
+    <p>This is a music sharing platform. Enjoy!</p>
+    <button onclick="closeAbout()">Close</button>
+  </div>
+
+  <!-- Main header -->
   <header>
-    <div id="countdown">Loading Hug Hour...</div>
+    <h1>TeaHug</h1>
     <button id="aboutBtn">About</button>
   </header>
 
-  <!-- SONG FEED -->
-  <div id="songFeed"></div>
+  <!-- TikTok-style song feed -->
+  <main id="songFeed"></main>
 
-  <!-- INTRO POPUP -->
-  <div id="introPopup" class="popup">
-    <p>Welcome to TeaHug! Enjoy the music and send your hugs ❤️</p>
+  <!-- Message popup -->
+  <div id="messagePopup" class="popup hidden">
+    <h3 id="songTitle"></h3>
+    <textarea id="userMessage" placeholder="Type your message..."></textarea>
+    <button id="sendMsgBtn">Send</button>
+    <button onclick="closeMessageForm()">Cancel</button>
   </div>
 
-  <!-- ABOUT POPUP -->
-  <div id="aboutPopup" class="popup">
-    <span class="close-btn" onclick="closeAbout()">×</span>
-    <h2>About TeaHug</h2>
-    <p>This platform allows you to send music + messages to your friends!</p>
-  </div>
-
-  <!-- MESSAGE POPUP -->
-  <div id="messagePopup" class="popup">
-    <span class="close-btn" onclick="closeMessageForm()">×</span>
-    <h3 id="songTitle">Song Title</h3>
-    <textarea id="userMessage" placeholder="Write your message here"></textarea>
-    <button id="sendMsgBtn">Send Message</button>
-  </div>
+  <!-- Countdown to Hug Hour -->
+  <div id="countdown" class="countdown"></div>
 
   <script type="module" src="main.js"></script>
 </body>
