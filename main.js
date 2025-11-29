@@ -1,5 +1,9 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -14,7 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM elements
+// DOM Elements
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const aboutPopup = document.getElementById("aboutPopup");
@@ -27,75 +31,90 @@ const sendMsgBtn = document.getElementById("sendMsgBtn");
 
 let allSongs = [];
 let currentIndex = 0;
-let songElements = [];
 let audioPlayers = [];
 
-// Intro popup auto-hide (5 sec)
+// =====================
+// Intro popup auto-hide
+// =====================
 setTimeout(() => introPopup.classList.add("hidden"), 5000);
 
-// Show About popup only when About button is clicked
+// =====================
+// About popup
+// =====================
 aboutBtn.addEventListener("click", () => {
   aboutPopup.classList.remove("hidden");
 });
 
-// Function to close About popup
-window.closeAbout = () => aboutPopup.classList.add("hidden");
-// Message popup
-window.closeMessageForm = () => messagePopup.classList.add("hidden");
+window.closeAbout = function () {
+  aboutPopup.classList.add("hidden");
+};
 
-// Load songs
+// =====================
+// Message popup
+// =====================
+window.closeMessageForm = function () {
+  messagePopup.classList.add("hidden");
+};
+
+// =====================
+// Load songs from Firestore
+// =====================
 async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
-  snapshot.forEach(doc => allSongs.push({ id: doc.id, ...doc.data() }));
+  allSongs = [];
+  snapshot.forEach(doc => {
+    allSongs.push({ id: doc.id, ...doc.data() });
+  });
 
   shuffleSongs();
   buildFeed();
-  playSong(0);
+  showSong(0);
 }
 
-// Shuffle
+// Shuffle songs randomly
 function shuffleSongs() {
   for (let i = allSongs.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
   }
 }
 
-// Build feed
+// =====================
+// Build TikTok-style feed
+// =====================
 function buildFeed() {
   songFeed.innerHTML = "";
-  songElements = [];
   audioPlayers = [];
 
-  allSongs.forEach((song, index) => {
+  allSongs.forEach((song, i) => {
     const card = document.createElement("div");
     card.classList.add("song-card");
-    card.style.backgroundImage = `url(${song.coverURL})`;
+    card.style.height = "100vh"; // full viewport height
+
+    card.innerHTML = `
+      <img src="${song.coverURL}" class="song-img">
+      <div class="play-overlay">▶</div>
+      <button class="sendBtn">Send</button>
+    `;
 
     const audio = new Audio(song.songURL);
     audio.loop = true;
-
     audioPlayers.push(audio);
-    songElements.push(card);
 
-    const playOverlay = document.createElement("div");
-    playOverlay.classList.add("play-overlay");
-    playOverlay.textContent = "▶";
-    card.appendChild(playOverlay);
+    // Send button
+    card.querySelector(".sendBtn").onclick = () => openMessageForm(song);
 
-    const sendBtn = document.createElement("button");
-    sendBtn.classList.add("sendBtn");
-    sendBtn.textContent = "Send";
-    sendBtn.onclick = () => openMessageForm(song);
-    card.appendChild(sendBtn);
-
-    card.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        playOverlay.style.display = "none";
-      } else {
-        audio.pause();
-        playOverlay.style.display = "block";
+    // Tap to play/pause
+    const playOverlay = card.querySelector(".play-overlay");
+    card.addEventListener("click", (e) => {
+      if (e.target !== card.querySelector(".sendBtn")) {
+        if (audio.paused) {
+          audio.play();
+          playOverlay.style.display = "none";
+        } else {
+          audio.pause();
+          playOverlay.style.display = "block";
+        }
       }
     });
 
@@ -105,71 +124,114 @@ function buildFeed() {
   enableSwipe();
 }
 
+// =====================
 // Swipe navigation
+// =====================
 function enableSwipe() {
-  let startY = 0, endY = 0;
-  songFeed.addEventListener("touchstart", e => startY = e.touches[0].clientY);
-  songFeed.addEventListener("touchend", e => {
+  let startY = 0;
+  let endY = 0;
+
+  songFeed.addEventListener("touchstart", (e) => {
+    startY = e.touches[0].clientY;
+  });
+
+  songFeed.addEventListener("touchend", (e) => {
     endY = e.changedTouches[0].clientY;
     if (startY - endY > 80) nextSong();
     if (endY - startY > 80) prevSong();
   });
 }
 
-function nextSong() {
+// Show song at index
+function showSong(i) {
   stopAll();
-  currentIndex = (currentIndex + 1) % songElements.length;
-  scrollToSong(currentIndex);
-  playSong(currentIndex);
+  currentIndex = i;
+  songFeed.children[i].scrollIntoView({ behavior: "smooth" });
+  audioPlayers[i].play();
+}
+
+// Stop all audio
+function stopAll() {
+  audioPlayers.forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
+}
+
+// Next / Previous song
+function nextSong() {
+  currentIndex++;
+  if (currentIndex >= allSongs.length) currentIndex = 0;
+  showSong(currentIndex);
 }
 
 function prevSong() {
-  stopAll();
-  currentIndex = (currentIndex - 1 + songElements.length) % songElements.length;
-  scrollToSong(currentIndex);
-  playSong(currentIndex);
+  currentIndex--;
+  if (currentIndex < 0) currentIndex = allSongs.length - 1;
+  showSong(currentIndex);
 }
 
-function scrollToSong(i) { songElements[i].scrollIntoView({ behavior: "smooth" }); }
-function playSong(i) { stopAll(); audioPlayers[i].play(); }
-function stopAll() { audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; }); }
-
-// Message form
+// =====================
+// Open message form
+// =====================
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
+
   sendMsgBtn.onclick = () => sendEmail(song);
 }
 
-// Dummy sendEmail function (replace with actual endpoint)
+// =====================
+// Send email (worker endpoint)
+// =====================
 async function sendEmail(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const res = await fetch("/send", { method: "POST", body: JSON.stringify({ title: song.title, message }) });
+  const payload = {
+    title: song.title,
+    message
+  };
+
+  const res = await fetch("https://teahug.workers.dev/send", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+
   if (res.ok) {
     alert("Message sent ❤️");
     messagePopup.classList.add("hidden");
     userMsgInput.value = "";
-  } else alert("Failed to send message.");
+  } else {
+    alert("Failed to send message.");
+  }
 }
 
-// Hug hour countdown
+// =====================
+// Hug Hour countdown (9PM–12AM)
+// =====================
 function updateCountdown() {
   const now = new Date();
-  const hour = now.getHours();
-  if (hour >= 21) { countdownEl.textContent = "Hug Hour Active ❤️"; return; }
+  const currentHour = now.getHours();
+  const target = new Date();
+  target.setHours(21, 0, 0, 0);
 
-  const target = new Date(); target.setHours(21,0,0,0);
-  const diff = target - now;
+  if (currentHour >= 21 && currentHour < 24) {
+    countdownEl.textContent = "Hug Hour Active ❤️";
+    return;
+  }
+
+  let diff = target - now;
+  if (diff < 0) diff += 24 * 60 * 60 * 1000; // next day
   const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000)/60000);
+  const m = Math.floor((diff % 3600000) / 60000);
   countdownEl.textContent = `${h}h ${m}m to Hug Hour`;
 }
 
 setInterval(updateCountdown, 1000);
 
-// Start everything
+// =====================
+// Start
+// =====================
 loadSongs();
 updateCountdown();
-
