@@ -1,23 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeaHug TikTok Feed</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeaHug TikTok Feed</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <main id="songFeed"></main>
 
-<!-- Optional popups -->
+<!-- Popups -->
 <div id="introPopup" class="popup">Welcome to TeaHug!</div>
-<div id="aboutPopup" class="popup hidden">About TeaHug...</div>
+<div id="aboutPopup" class="popup hidden">About TeaHug: Share songs and messages with friends!</div>
 <div id="messagePopup" class="popup hidden">
   <h2 id="songTitle"></h2>
-  <textarea id="userMessage" placeholder="Type your message"></textarea>
+  <textarea id="userMessage" placeholder="Type your message..."></textarea>
   <button id="sendMsgBtn">Send</button>
   <button onclick="closeMessageForm()">Close</button>
 </div>
+
+<button id="aboutBtn" class="aboutBtn">About</button>
 
 <script type="module" src="main.js"></script>
 </body>
