@@ -1,34 +1,47 @@
-export default {
-  async fetch(request, env) {
-    if (request.method !== "POST") {
-      return new Response("Method not allowed", { status: 405 });
-    }
-
+export const onRequestPost = async ({ request, env }) => {
+  try {
+    // Parse uploaded form data
     const formData = await request.formData();
     const song = formData.get("song");
     const cover = formData.get("cover");
 
     if (!song || !cover) {
-      return new Response(JSON.stringify({ success: false, message: "Missing files" }), {
+      return new Response(JSON.stringify({ success: false, error: "Missing files" }), {
         status: 400,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" }
       });
     }
 
-    // Save files to R2
-    const songKey = `songs/${song.name}`;
-    const coverKey = `covers/${cover.name}`;
+    // Generate unique filenames
+    const songFileName = `songs/${Date.now()}-${song.name}`;
+    const coverFileName = `covers/${Date.now()}-${cover.name}`;
 
-    await env.R2_BUCKET.put(songKey, song.stream());
-    await env.R2_BUCKET.put(coverKey, cover.stream());
-
-    // Build public URLs
-    const songUrl = `${env.R2_BUCKET_DOMAIN}/${songKey}`;
-    const coverUrl = `${env.R2_BUCKET_DOMAIN}/${coverKey}`;
-
-    return new Response(JSON.stringify({ success: true, songUrl, coverUrl }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    // Upload song to R2
+    await env.TeaHug.put(songFileName, await song.arrayBuffer(), {
+      httpMetadata: { contentType: song.type }
     });
-  },
+
+    // Upload cover to R2
+    await env.TeaHug.put(coverFileName, await cover.arrayBuffer(), {
+      httpMetadata: { contentType: cover.type }
+    });
+
+    // PUBLIC URL format
+    const baseURL = "https://e649bff25d83241bebe214ddd3beb656.r2.cloudflarestorage.com";
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        songUrl: `${baseURL}/${songFileName}`,
+        coverUrl: `${baseURL}/${coverFileName}`
+      }),
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: error.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
 };
