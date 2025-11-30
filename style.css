@@ -1,77 +1,72 @@
 /* ===============================
-   TEAHUG CSS
-   TikTok-style feed + popups
+   GENERAL STYLES
    =============================== */
-
-/* ===== Reset & Base ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  background-color: #121212;
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #000;
   color: #fff;
   overflow-x: hidden;
-  position: relative;
 }
 
 button {
   cursor: pointer;
-  border: none;
   outline: none;
+  border: none;
 }
 
-/* ===== Countdown ===== */
-.countdown {
+/* ===============================
+   COUNTDOWN
+   =============================== */
+#countdown {
   position: fixed;
-  top: 10px;
+  top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.6);
-  padding: 8px 16px;
-  border-radius: 20px;
+  font-size: 20px;
   font-weight: bold;
-  z-index: 1000;
-  font-size: 1rem;
+  background: rgba(0,0,0,0.5);
+  padding: 10px 20px;
+  border-radius: 20px;
+  z-index: 100;
 }
 
-/* ===== Song Feed ===== */
+/* ===============================
+   SONG FEED - TikTok style
+   =============================== */
 .song-feed {
   display: flex;
   flex-direction: column;
+  height: 100vh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
-  height: 100vh;
+  -webkit-overflow-scrolling: touch;
 }
 
 .song-card {
   scroll-snap-align: start;
-  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 100vh;
-  background: #1e1e1e;
-  border-bottom: 1px solid #333;
+  width: 100%;
+  position: relative;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .song-img {
   width: 80%;
   max-width: 400px;
   border-radius: 20px;
-  margin-bottom: 20px;
   object-fit: cover;
+  margin-bottom: 20px;
 }
 
-/* Play overlay */
 .play-overlay {
   position: absolute;
-  font-size: 50px;
+  font-size: 60px;
   color: rgba(255,255,255,0.7);
   top: 50%;
   left: 50%;
@@ -79,7 +74,7 @@ button {
   pointer-events: none;
 }
 
-/* Send button at bottom center */
+/* Send button fixed at bottom center */
 .song-card .sendBtn {
   position: absolute;
   bottom: 40px;
@@ -88,98 +83,67 @@ button {
   background: #ff3b30;
   color: #fff;
   font-weight: bold;
-  padding: 10px 20px;
+  padding: 12px 25px;
   border-radius: 30px;
-  font-size: 1rem;
-  transition: all 0.2s ease-in-out;
+  font-size: 16px;
+  transition: 0.2s;
 }
 
 .song-card .sendBtn:hover {
-  transform: translateX(-50%) scale(1.05);
+  background: #ff5c50;
 }
 
-/* ===== Popups ===== */
+/* ===============================
+   POPUPS
+   =============================== */
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0.9);
-  background: #1f1f1f;
-  border-radius: 15px;
-  padding: 20px 30px;
-  width: 90%;
-  max-width: 400px;
-  z-index: 10000;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.3s ease-in-out;
-}
-
-.popup.show {
-  opacity: 1;
-  pointer-events: all;
-  transform: translate(-50%, -50%) scale(1);
-}
-
-.popup-content h2 {
-  font-size: 1.3rem;
-  margin-bottom: 10px;
-}
-
-.popup-content p {
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-}
-
-.popup-content ol {
-  margin-left: 20px;
-  margin-bottom: 10px;
-}
-
-.popup-close-btn {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  background: transparent;
-  color: #fff;
-  font-size: 1.2rem;
-}
-
-.popup-send-btn {
-  background: #34c759;
-  color: #fff;
-  font-weight: bold;
-  padding: 10px 20px;
-  border-radius: 30px;
-  width: 100%;
-  margin-top: 10px;
-  transition: all 0.2s ease-in-out;
-}
-
-.popup-send-btn:hover {
-  transform: scale(1.05);
-}
-
-/* Hidden class */
-.hidden {
-  display: none !important;
-}
-
-/* ===== About Button ===== */
-.about-button {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: #007aff;
-  color: #fff;
-  padding: 8px 16px;
+  transform: translate(-50%, -50%);
+  background: #111;
+  padding: 30px 40px;
   border-radius: 20px;
-  z-index: 1000;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 20px rgba(255,255,255,0.2);
+  z-index: 200;
+  display: none; /* hidden by default */
+  max-width: 90%;
+  text-align: center;
 }
 
-.about-button:hover {
-  transform: scale(1.05);
+.popup h2 {
+  margin-top: 0;
+}
+
+.popup button.closeBtn {
+  margin-top: 20px;
+  background: #ff3b30;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.popup button.closeBtn:hover {
+  background: #ff5c50;
+}
+
+/* ===============================
+   INTRO POPUP
+   =============================== */
+#introPopup {
+  display: block; /* visible on page load, JS will hide after 5s */
+}
+
+/* ===============================
+   ABOUT POPUP
+   =============================== */
+#aboutPopup {
+  display: none; /* only shows when About button clicked */
+}
+
+/* ===============================
+   MESSAGE POPUP
+   =============================== */
+#messagePopup {
+  display: none; /* only shows when Send button clicked */
 }
