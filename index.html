@@ -1,46 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeaHug</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TeaHug</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Intro Popup -->
-  <div id="introPopup" class="popup intro-popup">
-    <h2>TeaHug: Set the MOOD with SURPRISES... not MESSAGES</h2>
-    <p>Pick a song vibe. We deliver the surprise during nightly Hug Hours.</p>
-  </div>
+<!-- Countdown at top -->
+<div id="countdown" class="countdown"></div>
 
-  <!-- About Popup -->
-  <div id="aboutPopup" class="popup about-popup hidden">
-    <h2>About TeaHug 🫖</h2>
-    <p>
-      "Set the MOOD with SURPRISES... not MESSAGES"<br>
-      TeaHug turns your favorite songs into emotional surprises. Pick a 15-second snippet, choose your vibe, express your feelings and we'll deliver it as a beautiful surprise.
-    </p>
-    <button onclick="closeAbout()">Close</button>
-  </div>
+<!-- TikTok-style song feed -->
+<div id="songFeed"></div>
 
-  <!-- Message Popup -->
-  <div id="messagePopup" class="popup message-popup hidden">
+<!-- Message Popup -->
+<div id="messagePopup" class="popup hidden">
+  <div class="popup-content">
     <h3 id="songTitle">Song Title</h3>
     <textarea id="userMessage" placeholder="Write your message..."></textarea>
     <button id="sendMsgBtn">Send</button>
     <button onclick="closeMessageForm()">Close</button>
   </div>
+</div>
 
-  <!-- Main Song Feed -->
-  <div id="songFeed" class="song-feed"></div>
-
-  <!-- Footer / Countdown -->
-  <div class="footer">
-    <div id="countdown"></div>
-    <button id="aboutBtn">About</button>
-  </div>
-
-  <script type="module" src="main.js"></script>
+<script type="module" src="main.js"></script>
 </body>
 </html>
