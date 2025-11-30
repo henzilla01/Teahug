@@ -1,13 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-/* ===== FIREBASE CONFIG - use your project values ===== */
+/* ===== FIREBASE CONFIG ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -20,97 +14,76 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ===== DOM ===== */
+/* ===== DOM ELEMENTS ===== */
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const aboutPopup = document.getElementById("aboutPopup");
-const aboutBtn = document.getElementById("aboutBtn");
 const messagePopup = document.getElementById("messagePopup");
+const aboutBtn = document.getElementById("aboutBtn");
+const countdownEl = document.getElementById("countdown");
 const songTitleEl = document.getElementById("songTitle");
 const userMsgInput = document.getElementById("userMessage");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
-const countdownEl = document.getElementById("countdown");
 
-/* ===== Worker endpoint for messages - replace if different ===== */
-const MESSAGE_WORKER = "https://teahug.workers.dev/send";
-
-/* ===== State ===== */
 let allSongs = [];
-let audioPlayers = [];
 let currentIndex = 0;
+let songElements = [];
+let audioPlayers = [];
 
-/* ===== Intro popup show/hide ===== */
-introPopup.classList.remove("hidden");
-setTimeout(() => introPopup.classList.add("hidden"), 5000);
+/* ===== POPUPS ===== */
+setTimeout(() => introPopup.classList.add("hidden"), 5000); // Intro popup 5s
 
-/* ===== About popup logic ===== */
-aboutBtn.addEventListener("click", () => aboutPopup.classList.remove("hidden"));
+aboutBtn.addEventListener("click", () => {
+  aboutPopup.classList.remove("hidden");
+});
+
 window.closeAbout = () => aboutPopup.classList.add("hidden");
-
-/* ===== Message popup logic ===== */
 window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
-/* ===== Load songs from Firestore ===== */
+/* ===== LOAD SONGS ===== */
 async function loadSongs() {
-  // order by timestamp desc (newest first)
-  const q = query(collection(db, "songs"), orderBy("timestamp", "desc"));
-  const snap = await getDocs(q);
-  allSongs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const snapshot = await getDocs(collection(db, "songs"));
+  snapshot.forEach(doc => allSongs.push({ id: doc.id, ...doc.data() }));
+  shuffleSongs();
   buildFeed();
-  if (audioPlayers.length) playSong(0);
+  playSong(0);
 }
 
+/* ===== SHUFFLE ===== */
+function shuffleSongs() {
+  for (let i = allSongs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
+  }
+}
+
+/* ===== BUILD FEED ===== */
 function buildFeed() {
   songFeed.innerHTML = "";
+  songElements = [];
   audioPlayers = [];
 
-  allSongs.forEach((s, i) => {
+  allSongs.forEach((song, index) => {
     const card = document.createElement("div");
-    card.className = "song-card";
+    card.classList.add("song-card");
 
-    // cover image element
-    const img = document.createElement("img");
-    img.className = "cover";
-    img.src = s.coverURL || "";
-    img.alt = s.title || "cover";
-
-    // content overlay
-    const content = document.createElement("div");
-    content.className = "card-content";
-    content.innerHTML = `
-      <div class="meta">
-        <div style="font-weight:800; font-size:18px;">${s.title || "Untitled"}</div>
-        <div style="opacity:0.9; margin-top:6px;">${s.artist || ""}</div>
-      </div>
+    card.innerHTML = `
+      <img src="${song.cover}" class="song-img">
+      <div class="play-overlay">▶</div>
+      <button class="sendBtn">Send</button>
     `;
 
-    // play overlay + send button
-    const playOverlay = document.createElement("div");
-    playOverlay.className = "play-overlay";
-    playOverlay.textContent = "▶";
-
-    const sendBtn = document.createElement("button");
-    sendBtn.className = "send-btn";
-    sendBtn.textContent = "Send";
-
-    // audio player (not attached to DOM)
-    const audio = new Audio(s.songURL);
+    const audio = new Audio(song.url);
     audio.loop = true;
+
     audioPlayers.push(audio);
+    songElements.push(card);
 
-    // card assembly
-    card.appendChild(img);
-    card.appendChild(content);
-    card.appendChild(playOverlay);
-    card.appendChild(sendBtn);
-    songFeed.appendChild(card);
+    card.querySelector(".sendBtn").onclick = () => openMessageForm(song);
 
-    // Tap card to toggle play/pause
-    card.addEventListener("click", (ev) => {
-      // if user clicked the "Send" button, we ignore toggle here
-      if (ev.target === sendBtn) return;
+    const playOverlay = card.querySelector(".play-overlay");
+    card.addEventListener("click", () => {
       if (audio.paused) {
-        stopAll();
         audio.play();
         playOverlay.style.display = "none";
       } else {
@@ -119,131 +92,98 @@ function buildFeed() {
       }
     });
 
-    // Send button opens message popup ONLY
-    sendBtn.addEventListener("click", (ev) => {
-      ev.stopPropagation();
-      openMessageForm(s);
-    });
+    songFeed.appendChild(card);
   });
 
   enableSwipe();
 }
 
-/* ===== Swipe navigation for mobile ===== */
+/* ===== SWIPE NAV ===== */
 function enableSwipe() {
   let startY = 0;
   songFeed.addEventListener("touchstart", (e) => startY = e.touches[0].clientY);
   songFeed.addEventListener("touchend", (e) => {
-    const endY = e.changedTouches[0].clientY;
+    let endY = e.changedTouches[0].clientY;
     if (startY - endY > 80) nextSong();
     if (endY - startY > 80) prevSong();
   });
-
-  // handle desktop scroll snap -> update playing item
-  songFeed.addEventListener("scroll", throttle(() => {
-    const idx = Math.round(songFeed.scrollTop / window.innerHeight);
-    if (idx !== currentIndex) {
-      currentIndex = idx;
-      stopAll();
-      if (audioPlayers[currentIndex]) audioPlayers[currentIndex].play();
-    }
-  }, 120));
 }
 
-/* throttle helper */
-function throttle(fn, wait) {
-  let t = null;
-  return (...args) => {
-    if (t) return;
-    t = setTimeout(() => { fn(...args); t = null; }, wait);
-  };
-}
-
-/* navigation */
+/* ===== SONG NAV ===== */
 function nextSong() {
-  currentIndex = Math.min(audioPlayers.length - 1, currentIndex + 1);
-  scrollTo(currentIndex);
   stopAll();
-  if (audioPlayers[currentIndex]) audioPlayers[currentIndex].play();
+  currentIndex = (currentIndex + 1) % songElements.length;
+  scrollToSong(currentIndex);
+  playSong(currentIndex);
 }
+
 function prevSong() {
-  currentIndex = Math.max(0, currentIndex - 1);
-  scrollTo(currentIndex);
   stopAll();
-  if (audioPlayers[currentIndex]) audioPlayers[currentIndex].play();
-}
-function scrollTo(i) {
-  const child = songFeed.children[i];
-  if (child) child.scrollIntoView({ behavior: "smooth" });
+  currentIndex = (currentIndex - 1 + songElements.length) % songElements.length;
+  scrollToSong(currentIndex);
+  playSong(currentIndex);
 }
 
-/* stop all audio */
+function scrollToSong(i) {
+  songElements[i].scrollIntoView({ behavior: "smooth" });
+}
+
+function playSong(i) {
+  stopAll();
+  audioPlayers[i].play();
+}
+
 function stopAll() {
-  audioPlayers.forEach(a => { try { a.pause(); a.currentTime = 0; } catch(e){} });
+  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
 }
 
-/* open message popup for a specific song */
+/* ===== MESSAGE POPUP ===== */
 function openMessageForm(song) {
-  songTitleEl.textContent = song.title || "Untitled";
+  songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
 
-  // set fresh handler
-  sendMsgBtn.onclick = () => sendMessage(song);
+  sendMsgBtn.onclick = () => sendEmail(song);
 }
 
-/* send message to your worker endpoint (blocks during Hug Hour) */
-async function sendMessage(song) {
-  const message = (userMsgInput.value || "").trim();
+async function sendEmail(song) {
+  const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const now = new Date();
-  const hour = now.getHours();
-  // Hug Hour is 21:00 - 23:59 (9PM-12AM)
-  if (hour >= 21 && hour < 24) {
-    return alert("Messages cannot be sent during Hug Hour (9PM–12AM).");
-  }
+  const payload = { title: song.title, message };
+  const res = await fetch("https://teahug.workers.dev/send", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
 
-  // POST to worker
-  try {
-    const payload = { title: song.title || "Untitled", message };
-    const res = await fetch(MESSAGE_WORKER, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    if (res.ok) {
-      alert("Message sent ❤️");
-      userMsgInput.value = "";
-      messagePopup.classList.add("hidden");
-    } else {
-      alert("Failed to send message.");
-    }
-  } catch (err) {
-    console.error(err);
+  if (res.ok) {
+    alert("Message sent ❤️");
+    messagePopup.classList.add("hidden");
+    userMsgInput.value = "";
+  } else {
     alert("Failed to send message.");
   }
 }
 
-/* ===== Hug Hour countdown ===== */
+/* ===== HUG HOUR COUNTDOWN ===== */
 function updateCountdown() {
   const now = new Date();
-  const currentHour = now.getHours();
-  if (currentHour >= 21 && currentHour < 24) {
+  const hour = now.getHours();
+  let target = new Date();
+  target.setHours(21, 0, 0, 0);
+
+  if (hour >= 21) {
     countdownEl.textContent = "Hug Hour Active ❤️";
     return;
   }
-  const next = new Date();
-  next.setHours(21,0,0,0);
-  if (next <= now) next.setDate(next.getDate() + 1);
-  const diff = next - now;
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
-  const s = Math.floor((diff % 60000) / 1000);
-  countdownEl.textContent = `${h}h ${m}m ${s}s to Hug Hour`;
+
+  let diff = target - now;
+  let h = Math.floor(diff / 3600000);
+  let m = Math.floor((diff % 3600000) / 60000);
+  countdownEl.textContent = `${h}h ${m}m to Hug Hour`;
 }
+
 setInterval(updateCountdown, 1000);
 
-/* start */
+/* ===== START ===== */
 loadSongs();
 updateCountdown();
