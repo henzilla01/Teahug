@@ -70,24 +70,28 @@ function buildFeed() {
   songElements = [];
   audioPlayers = [];
 
-  allSongs.forEach((song, index) => {
+  // Clone first and last songs for seamless infinite scroll
+  const loopSongs = [allSongs[allSongs.length - 1], ...allSongs, allSongs[0]];
+
+  loopSongs.forEach((song, index) => {
     const card = document.createElement("div");
     card.classList.add("song-card");
 
     card.innerHTML = `
-      <img src="${song.coverURL}" class="song-img"/>
+      <img src="${song.cover}" class="song-img">
       <div class="play-overlay">▶</div>
       <button class="sendBtn">Send</button>
     `;
 
-    const audio = new Audio(song.songURL);
+    const audio = new Audio(song.url);
     audio.loop = true;
+
     audioPlayers.push(audio);
     songElements.push(card);
 
-    // Send button click
+    // Send button
     card.querySelector(".sendBtn").onclick = (e) => {
-      e.stopPropagation(); // prevent pause/play
+      e.stopPropagation(); // Prevent pausing song
       openMessageForm(song);
     };
 
@@ -95,7 +99,6 @@ function buildFeed() {
     const playOverlay = card.querySelector(".play-overlay");
     card.addEventListener("click", () => {
       if (audio.paused) {
-        stopAll();
         audio.play();
         playOverlay.style.display = "none";
       } else {
@@ -107,29 +110,33 @@ function buildFeed() {
     songFeed.appendChild(card);
   });
 
-  enableScrollSnap();
+  // Scroll to the "real" first song (index 1 because 0 is cloned last song)
+  songFeed.scrollTop = window.innerHeight;
+
+  enableInfiniteScroll();
 }
 
-/* ===============================
-   SCROLL SNAP
-   =============================== */
-function enableScrollSnap() {
+function enableInfiniteScroll() {
   songFeed.addEventListener("scroll", () => {
-    const index = Math.round(songFeed.scrollTop / window.innerHeight);
-    if (index !== currentIndex) {
-      stopAll();
-      currentIndex = index;
-      audioPlayers[currentIndex]?.play();
-    }
-  });
-}
+    const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
 
-/* ===============================
-   PLAY/STOP SONGS
-   =============================== */
-function playSong(i) {
-  stopAll();
-  audioPlayers[i]?.play();
+    // Jump to correct position for infinite effect
+    if (scrollIndex === 0) {
+      // User scrolled to cloned last song
+      songFeed.scrollTop = allSongs.length * window.innerHeight;
+      currentIndex = allSongs.length - 1;
+    } else if (scrollIndex === songElements.length - 1) {
+      // User scrolled to cloned first song
+      songFeed.scrollTop = window.innerHeight;
+      currentIndex = 0;
+    } else {
+      currentIndex = scrollIndex - 1; // Adjust for cloned card
+    }
+
+    // Play the correct audio
+    stopAll();
+    audioPlayers[scrollIndex]?.play();
+  });
 }
 
 function stopAll() {
@@ -203,3 +210,4 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
