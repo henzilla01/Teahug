@@ -7,53 +7,38 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  
-  <!-- Intro Popup (shows on reload for 5 seconds) -->
-  <div id="introPopup" class="popup">
-    <div class="popup-content">
-      <h2>TeaHug: Set the MOOD with SURPRISES... not MESSAGES</h2>
-      <p>Pick a song vibe. Set the mood. We deliver the surprise during nightly Hug Hours. Free • No Signup • Just Good Vibes</p>
-    </div>
+
+  <!-- Countdown at the top -->
+  <div id="countdown" class="countdown"></div>
+
+  <!-- Song Feed -->
+  <div id="songFeed" class="song-feed"></div>
+
+  <!-- Intro Popup -->
+  <div id="introPopup" class="popup intro-popup">
+    <h2>Welcome to TeaHug 🫖</h2>
+    <p>"Set the MOOD with SURPRISES... not MESSAGES"</p>
   </div>
 
-  <!-- About Popup (only opens when button clicked) -->
-  <div id="aboutPopup" class="popup hidden">
-    <div class="popup-content">
-      <h2>About TeaHug 🫖</h2>
-      <p>"Set the MOOD with SURPRISES... not MESSAGES"</p>
-      <p>TeaHug turns your favorite songs into emotional surprises. Pick a 15-second snippet, choose your vibe, express your feelings and we'll deliver it as a beautiful surprise.</p>
-      <ol>
-        <li>Choose a song snippet (15 seconds)</li>
-        <li>Pick your mood/vibe</li>
-        <li>We deliver it during Hug Hour (9PM-12AM daily)</li>
-      </ol>
-      <p>No signup. No fees. Pure emotional connection.</p>
-      <button onclick="closeAbout()" class="popup-close-btn">✕</button>
-    </div>
+  <!-- About Popup -->
+  <div id="aboutPopup" class="popup about-popup hidden">
+    <h2>About TeaHug 🫖</h2>
+    <p>Pick a song vibe. Set the mood. We deliver the surprise during nightly Hug Hours.</p>
+    <button onclick="closeAbout()">Close</button>
   </div>
 
-  <!-- Message Popup (opens when Send button clicked) -->
-  <div id="messagePopup" class="popup hidden">
-    <div class="popup-content">
-      <h2 id="songTitle">Song Title</h2>
-      <p>Type in the recipient's name and phone number followed by what you would like to tell the person</p>
-      <input type="text" id="userMessage" placeholder="Name, phone, and message">
-      <button id="sendMsgBtn" class="popup-send-btn">Send</button>
-      <button onclick="closeMessageForm()" class="popup-close-btn">✕</button>
-    </div>
+  <!-- Message Popup -->
+  <div id="messagePopup" class="popup message-popup hidden">
+    <h3 id="songTitle">Song Title</h3>
+    <p>Type in the recipient's name and phone number followed by your message.</p>
+    <input type="text" id="userMessage" placeholder="Your message here...">
+    <button id="sendMsgBtn">Send</button>
+    <button onclick="closeMessageForm()">Close</button>
   </div>
 
   <!-- About button -->
-  <button id="aboutBtn" class="about-button">About</button>
+  <button id="aboutBtn" class="about-btn">About</button>
 
-  <!-- Countdown -->
-  <div id="countdown" class="countdown"></div>
-
-  <!-- TikTok-style song feed -->
-  <div id="songFeed" class="song-feed"></div>
-
-  <!-- Scripts -->
   <script type="module" src="main.js"></script>
-  <script type="module" src="admin.js"></script>
 </body>
 </html>
