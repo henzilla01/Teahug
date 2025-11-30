@@ -1,93 +1,89 @@
 /* ===============================
-   GENERAL STYLES
+   TEAHUG - TikTok-style Feed CSS
    =============================== */
-body, html {
+
+/* Reset and base styles */
+* {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: 'Arial', sans-serif;
-  background-color: #000;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: #000;
   color: #fff;
-  overflow-x: hidden;
-}
-
-/* ===============================
-   COUNTDOWN FIXED TOP
-   =============================== */
-#countdown {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 20px;
-  font-weight: bold;
-  background: rgba(0,0,0,0.5);
-  padding: 10px 20px;
-  border-radius: 20px;
-  z-index: 100;
-}
-
-/* ===============================
-   SONG FEED - TikTok style
-   =============================== */
-.song-feed {
+  overflow: hidden; /* prevent extra scroll */
   height: 100vh;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
-  -webkit-overflow-scrolling: touch;
-  margin: 0;
-  padding: 0;
 }
 
-.song-card {
-.song-card {
-  position: relative;
-  width: 100vw;
-  height: 100vh; /* full screen */
+/* ===============================
+   SONG FEED
+   =============================== */
+#songFeed {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* content like send button at bottom */
-  align-items: center;
-  overflow: hidden;
-  border-bottom: 2px solid #fff; /* or any color for separation */
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100vh;
+  scroll-behavior: smooth;
 }
 
+.song-card {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  scroll-snap-align: start;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Song cover image */
 .song-card img.song-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* ensures cover fills the screen without distortion */
+  object-fit: cover;
 }
 
+/* Play overlay */
 .play-overlay {
   position: absolute;
-  font-size: 60px;
-  color: rgba(255,255,255,0.7);
+  font-size: 4rem;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  pointer-events: none;
+  transition: all 0.3s ease;
 }
 
-/* ===============================
-   SEND BUTTON
-   =============================== */
-.song-card .sendBtn {
+.song-card:hover .play-overlay {
+  color: #fff;
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+/* Send button at bottom center */
+.sendBtn {
   position: absolute;
-  bottom: 40px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
-  background: #ff3b30;
-  color: #fff;
-  font-weight: bold;
+  background: #ff4d6d;
+  border: none;
   padding: 12px 25px;
-  border-radius: 30px;
-  font-size: 16px;
-  transition: 0.2s;
+  border-radius: 25px;
+  font-size: 1rem;
+  color: #fff;
+  cursor: pointer;
   z-index: 10;
+  transition: background 0.3s ease;
 }
 
-.song-card .sendBtn:hover {
-  background: #ff5c50;
+.sendBtn:hover {
+  background: #ff1a4d;
 }
 
 /* ===============================
@@ -98,45 +94,64 @@ body, html {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #111;
-  padding: 30px 40px;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(255,255,255,0.2);
-  z-index: 200;
-  display: none; /* hidden by default */
-  max-width: 90%;
+  background: rgba(20, 20, 20, 0.95);
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(255, 0, 100, 0.4);
+  z-index: 100;
+  color: #fff;
   text-align: center;
-  animation: fadeIn 0.3s;
+  max-width: 90%;
+  width: 350px;
+  display: none;
+  animation: popupIn 0.5s forwards;
 }
 
-.popup h2 {
-  margin-top: 0;
+.popup.show {
+  display: block;
 }
 
-.popup button.closeBtn {
-  margin-top: 20px;
-  background: #ff3b30;
-  padding: 10px 20px;
+@keyframes popupIn {
+  0% { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.popup button {
+  margin-top: 15px;
+  padding: 8px 20px;
+  border: none;
+  background: #ff4d6d;
+  color: #fff;
   border-radius: 20px;
-  font-weight: bold;
   cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
 }
 
-.popup button.closeBtn:hover {
-  background: #ff5c50;
+.popup button:hover {
+  background: #ff1a4d;
 }
-   #aboutBtn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 9999; /* stays on top of the feed */
-   }
 
 /* ===============================
-   POPUP ANIMATION
+   COUNTDOWN
    =============================== */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -60%); }
-  to { opacity: 1; transform: translate(-50%, -50%); }
+#countdown {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 1rem;
+  z-index: 50;
+  color: #fff;
+  font-weight: bold;
 }
 
+/* ===============================
+   Hide Scrollbar
+   =============================== */
+#songFeed::-webkit-scrollbar {
+  display: none;
+}
