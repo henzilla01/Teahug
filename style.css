@@ -20,34 +20,58 @@ background-color: #000;
 color: #fff;
 }
 
-/* Song feed container (vertical scroll) */
+/* ===============================
+SONG FEED / CARD FIX
+Full-screen covers, scroll snapping, and borders
+=============================== */
+
 #songFeed {
 display: flex;
 flex-direction: column;
-scroll-snap-type: y mandatory;
-overflow-y: scroll;
 height: 100vh;
+overflow-y: scroll;
+scroll-snap-type: y mandatory; /* snap to each card */
+-webkit-overflow-scrolling: touch;
 }
 
-/* Each song card */
 .song-card {
 position: relative;
-height: 100vh;
+height: 100vh; /* full screen /
 width: 100%;
-scroll-snap-align: start;
+scroll-snap-align: start; / each card snaps to start /
 display: flex;
 flex-direction: column;
 justify-content: space-between;
-border-bottom: 2px solid #222;
+border-bottom: 2px solid #222; / TikTok-style border */
 background-color: #000;
 }
 
-/* Song cover image (full screen) */
 .song-img {
 width: 100%;
 height: 100%;
-object-fit: cover;
+object-fit: cover; /* cover full area without stretching */
 flex-grow: 1;
+}
+
+.sendBtn {
+position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background-color: #ff0055;
+border: none;
+padding: 12px 20px;
+border-radius: 25px;
+font-size: 16px;
+color: #fff;
+cursor: pointer;
+z-index: 10;
+transition: transform 0.2s, background-color 0.2s;
+}
+
+.sendBtn:hover {
+background-color: #ff3366;
+transform: translateX(-50%) scale(1.05);
 }
 
 /* Overlay play icon */
@@ -189,3 +213,4 @@ font-size: 14px;
 width: 90%;
 }
 }
+
