@@ -98,17 +98,44 @@ function buildFeed() {
   enableSwipe();
 }
 
-/* ===== SWIPE NAV ===== */
 function enableSwipe() {
   let startY = 0;
-  songFeed.addEventListener("touchstart", (e) => startY = e.touches[0].clientY);
+  let endY = 0;
+
+  songFeed.addEventListener("touchstart", (e) => {
+    startY = e.touches[0].clientY;
+  });
+
   songFeed.addEventListener("touchend", (e) => {
-    let endY = e.changedTouches[0].clientY;
-    if (startY - endY > 80) nextSong();
-    if (endY - startY > 80) prevSong();
+    endY = e.changedTouches[0].clientY;
+
+    const threshold = 50; // minimal swipe distance
+
+    if (startY - endY > threshold) swipeNext();
+    if (endY - startY > threshold) swipePrev();
   });
 }
 
+function swipeNext() {
+  stopAll();
+  currentIndex = (currentIndex + 1) % songElements.length; // loops to first
+  scrollToSong(currentIndex);
+  playSong(currentIndex);
+}
+
+function swipePrev() {
+  stopAll();
+  currentIndex = (currentIndex - 1 + songElements.length) % songElements.length; // loops to last
+  scrollToSong(currentIndex);
+  playSong(currentIndex);
+}
+
+function scrollToSong(i) {
+  songElements[i].scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
 /* ===== SONG NAV ===== */
 function nextSong() {
   stopAll();
@@ -187,3 +214,4 @@ setInterval(updateCountdown, 1000);
 /* ===== START ===== */
 loadSongs();
 updateCountdown();
+
