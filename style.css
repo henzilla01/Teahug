@@ -13,7 +13,7 @@
 body {
   background: #000;
   color: #fff;
-  overflow: hidden; /* prevent extra scroll */
+  overflow-x: hidden;
   height: 100vh;
 }
 
@@ -26,7 +26,6 @@ body {
   scroll-snap-type: y mandatory;
   overflow-y: scroll;
   height: 100vh;
-  scroll-behavior: smooth;
 }
 
 .song-card {
@@ -116,6 +115,7 @@ body {
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
+/* Close buttons inside popups */
 .popup button {
   margin-top: 15px;
   padding: 8px 20px;
@@ -150,7 +150,7 @@ body {
 }
 
 /* ===============================
-   Hide Scrollbar
+   OPTIONAL: Scrollbar hidden for cleaner look
    =============================== */
 #songFeed::-webkit-scrollbar {
   display: none;
