@@ -1,124 +1,187 @@
-/* ======= Reset ======= */
+/* ===============================
+TEAHUG REFINED CSS
+TikTok-style feed, full-screen covers, popups, buttons
+=============================== */
+
+/* ==== GLOBAL STYLES ==== */
 
 * {
 margin: 0;
 padding: 0;
 box-sizing: border-box;
-}
-
-/* ======= Body ======= */
-body {
 font-family: 'Arial', sans-serif;
-background-color: #000;
-overflow-x: hidden;
 color: #fff;
 }
 
-/* ======= Song Feed ======= */
+body {
+background-color: #000;
+overflow: hidden;
+}
+
+/* ===============================
+SONG FEED
+=============================== /
 #songFeed {
-height: 100vh;
-overflow-y: scroll;
-scroll-snap-type: y mandatory;
+height: 100vh;                 / full viewport /
+width: 100%;
+overflow-y: scroll;            / vertical scroll /
+scroll-snap-type: y mandatory; / snap per song */
+-webkit-overflow-scrolling: touch;
 }
 
-/* ======= Song Card ======= */
+/* ==== SONG CARD ==== /
 .song-card {
-  position: relative;
-  height: 100vh;               /* full viewport height */
-  width: 100%;                 /* full width */
-  scroll-snap-align: start;    /* snap on top */
-  border-bottom: 2px solid #fff; /* or any border to separate cards */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+position: relative;
+height: 100vh;                / full viewport height /
+width: 100%;
+scroll-snap-align: start;     / snap to top */
+border-bottom: 2px solid #fff;
+display: flex;
+justify-content: center;
+align-items: center;
+overflow: hidden;
+background-color: #000;
 }
 
+/* ==== SONG IMAGE ==== /
 .song-card img.song-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;  /* cover full card without distortion */
+width: 100%;
+height: 100%;
+object-fit: cover;            / cover full card without distortion */
+border-radius: 10px;
 }
 
-/* ======= Play Overlay ======= */
+/* ==== PLAY OVERLAY ==== */
 .song-card .play-overlay {
 position: absolute;
 top: 50%;
 left: 50%;
 transform: translate(-50%, -50%);
-font-size: 3rem;
-color: rgba(255, 255, 255, 0.8);
+font-size: 60px;
+color: rgba(255,255,255,0.8);
 pointer-events: none;
+z-index: 5;
 }
 
-/* ======= Send Button ======= */
+/* ==== SEND BUTTON ==== */
 .song-card .sendBtn {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  padding: 10px 20px;
-  background-color: rgba(255,255,255,0.8);
-  border-radius: 25px;
-  font-weight: bold;
-  cursor: pointer;
+position: absolute;
+bottom: 30px;
+left: 50%;
+transform: translateX(-50%);
+z-index: 10;
+padding: 12px 25px;
+background-color: rgba(255,255,255,0.85);
+color: #000;
+font-weight: bold;
+border: none;
+border-radius: 25px;
+cursor: pointer;
+transition: 0.3s ease;
 }
 
 .song-card .sendBtn:hover {
-background: rgba(255, 255, 255, 1);
+background-color: rgba(255,255,255,1);
 }
 
-/* ======= About Button ======= */
+/* ===============================
+POPUPS
+=============================== */
+#introPopup, #aboutPopup, #messagePopup {
+position: fixed;
+top: 20%;
+left: 50%;
+transform: translateX(-50%);
+background-color: rgba(0,0,0,0.85);
+padding: 25px 30px;
+border-radius: 15px;
+box-shadow: 0 5px 20px rgba(0,0,0,0.7);
+z-index: 100;
+width: 90%;
+max-width: 400px;
+text-align: center;
+transition: all 0.3s ease;
+opacity: 1;
+}
+
+#introPopup.hidden, #aboutPopup.hidden, #messagePopup.hidden {
+opacity: 0;
+transform: translateX(-50%) translateY(-50px);
+pointer-events: none;
+}
+
+#introPopup p, #aboutPopup p, #messagePopup p {
+font-size: 16px;
+line-height: 1.5;
+}
+
+/* ==== ABOUT BUTTON ==== */
 #aboutBtn {
 position: fixed;
 top: 20px;
 right: 20px;
-padding: 10px 16px;
-background: rgba(255,255,255,0.8);
+padding: 10px 18px;
+background-color: rgba(255,255,255,0.85);
 color: #000;
+font-weight: bold;
 border: none;
 border-radius: 20px;
-font-weight: bold;
-z-index: 20;
 cursor: pointer;
+z-index: 50;
+transition: 0.3s ease;
 }
 
-/* ======= Countdown ======= */
+#aboutBtn:hover {
+background-color: rgba(255,255,255,1);
+}
+
+/* ===============================
+COUNTDOWN
+=============================== */
 #countdown {
 position: fixed;
 top: 20px;
 left: 50%;
 transform: translateX(-50%);
-font-size: 1.2rem;
-font-weight: bold;
-z-index: 20;
-}
-
-/* ======= Popups ======= */
-.popup {
-position: fixed;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-background: rgba(20, 20, 20, 0.95);
-padding: 24px;
+background-color: rgba(0,0,0,0.6);
+padding: 8px 20px;
 border-radius: 20px;
-text-align: center;
-z-index: 30;
-color: #fff;
-max-width: 90%;
-display: none;
-}
-
-/* ======= Popup Close Button ======= */
-.popup .closeBtn {
-margin-top: 12px;
-padding: 6px 16px;
-background: #fff;
-color: #000;
-border-radius: 12px;
-cursor: pointer;
 font-weight: bold;
+z-index: 50;
 }
 
+/* ===============================
+MESSAGE FORM INPUTS
+=============================== */
+#messagePopup input, #messagePopup textarea {
+width: 100%;
+padding: 10px;
+margin-top: 10px;
+border-radius: 10px;
+border: none;
+outline: none;
+}
+
+/* ==== MESSAGE SUBMIT BUTTON ==== */
+#messagePopup button {
+margin-top: 15px;
+padding: 10px 20px;
+border: none;
+border-radius: 25px;
+background-color: #fff;
+color: #000;
+font-weight: bold;
+cursor: pointer;
+}
+
+/* ===============================
+SCROLLBAR (optional)
+=============================== */
+#songFeed::-webkit-scrollbar {
+width: 8px;
+}
+
+#songFeed::-webkit-scrollbar-thumb {
+background-color: rgba(255,255,255,0.5);
+border-radius: 4px;
+}
