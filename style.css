@@ -181,3 +181,60 @@ audio {
     padding: 20px;
   }
 }
+
+/* === POPUP BASE STYLE === */
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content {
+  width: 85%;
+  max-width: 380px;
+  background: #111;
+  border-radius: 14px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.message-box {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  border-radius: 8px;
+  padding: 10px;
+  border: none;
+  outline: none;
+}
+
+.closeBtn, .send-message-btn {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  background: #ff4d6d;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.closeBtn {
+  background: #444;
+  margin-top: 10px;
+}
