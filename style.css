@@ -1,129 +1,185 @@
-/* ===== Global Styles ===== */
-html, body {
+/* ===============================
+   TEAHUG CSS
+   TikTok-style feed + popups
+   =============================== */
+
+/* ===== Reset & Base ===== */
+* {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: sans-serif;
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-  background-color: #111;
-  color: #fff;
+  box-sizing: border-box;
 }
 
-#countdown {
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #121212;
+  color: #fff;
+  overflow-x: hidden;
+  position: relative;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* ===== Countdown ===== */
+.countdown {
   position: fixed;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
-  font-size: 18px;
   background: rgba(0,0,0,0.6);
-  padding: 6px 12px;
+  padding: 8px 16px;
   border-radius: 20px;
+  font-weight: bold;
+  z-index: 1000;
+  font-size: 1rem;
 }
 
 /* ===== Song Feed ===== */
-#songFeed {
-  height: 100vh;
+.song-feed {
+  display: flex;
+  flex-direction: column;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
+  height: 100vh;
 }
 
 .song-card {
-  height: 100vh;
   scroll-snap-align: start;
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
-  border: 2px solid #fff;
-  box-sizing: border-box;
+  height: 100vh;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
   padding: 20px;
-  background-size: cover;
-  background-position: center;
 }
 
-.song-card img.song-img {
-  max-height: 60%;
-  border-radius: 12px;
+.song-img {
+  width: 80%;
+  max-width: 400px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  object-fit: cover;
 }
 
+/* Play overlay */
 .play-overlay {
   position: absolute;
-  font-size: 48px;
-  color: #fff;
+  font-size: 50px;
+  color: rgba(255,255,255,0.7);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
 
-/* Send Button */
-.sendBtn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #ff4081;
-  border: none;
-  border-radius: 10px;
+/* Send button at bottom center */
+.song-card .sendBtn {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff3b30;
   color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
 }
-.sendBtn:hover { transform: scale(1.05); }
+
+.song-card .sendBtn:hover {
+  transform: translateX(-50%) scale(1.05);
+}
 
 /* ===== Popups ===== */
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  background: #222;
-  color: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  z-index: 2000;
+  transform: translate(-50%, -50%) scale(0.9);
+  background: #1f1f1f;
+  border-radius: 15px;
+  padding: 20px 30px;
   width: 90%;
   max-width: 400px;
-  text-align: center;
-  animation: fadeIn 0.5s;
+  z-index: 10000;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease-in-out;
 }
 
-.popup.hidden {
-  display: none;
+.popup.show {
+  opacity: 1;
+  pointer-events: all;
+  transform: translate(-50%, -50%) scale(1);
 }
 
-.popup-content h2, .popup-content h3 {
-  margin-top: 0;
+.popup-content h2 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
 }
 
-textarea {
-  width: 100%;
-  height: 80px;
-  margin: 10px 0;
-  border-radius: 10px;
-  border: none;
-  padding: 10px;
-  resize: none;
+.popup-content p {
+  font-size: 0.95rem;
+  margin-bottom: 10px;
 }
 
-/* About button */
-.about-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 16px;
-  border-radius: 50px;
-  border: none;
-  background: #6200ee;
+.popup-content ol {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.popup-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
   color: #fff;
-  cursor: pointer;
-  z-index: 1000;
+  font-size: 1.2rem;
 }
 
-/* Fade-in animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translate(-50%, -60%);}
-  to { opacity: 1; transform: translate(-50%, -50%);}
-    }
+.popup-send-btn {
+  background: #34c759;
+  color: #fff;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 30px;
+  width: 100%;
+  margin-top: 10px;
+  transition: all 0.2s ease-in-out;
+}
+
+.popup-send-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Hidden class */
+.hidden {
+  display: none !important;
+}
+
+/* ===== About Button ===== */
+.about-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #007aff;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  z-index: 1000;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+
+.about-button:hover {
+  transform: scale(1.05);
+}
