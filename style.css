@@ -40,24 +40,22 @@ body, html {
 }
 
 .song-card {
-  scroll-snap-align: start;
+.song-card {
+  position: relative;
+  width: 100vw;
+  height: 100vh; /* full screen */
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end; /* content like send button at bottom */
   align-items: center;
-  height: 100vh; /* full viewport */
-  width: 100%;
-  position: relative;
-  padding: 20px;
-  box-sizing: border-box;
+  overflow: hidden;
+  border-bottom: 2px solid #fff; /* or any color for separation */
 }
 
-.song-img {
-  width: 80%;
-  max-width: 400px;
-  border-radius: 20px;
-  object-fit: cover;
-  margin-bottom: 20px;
+.song-card img.song-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* ensures cover fills the screen without distortion */
 }
 
 .play-overlay {
@@ -127,6 +125,12 @@ body, html {
 .popup button.closeBtn:hover {
   background: #ff5c50;
 }
+   #aboutBtn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999; /* stays on top of the feed */
+   }
 
 /* ===============================
    POPUP ANIMATION
@@ -135,3 +139,4 @@ body, html {
   from { opacity: 0; transform: translate(-50%, -60%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
 }
+
