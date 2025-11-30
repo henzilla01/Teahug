@@ -16,7 +16,6 @@ color: #fff;
 
 /* ======= Song Feed ======= */
 #songFeed {
-width: 100%;
 height: 100vh;
 overflow-y: scroll;
 scroll-snap-type: y mandatory;
@@ -24,23 +23,21 @@ scroll-snap-type: y mandatory;
 
 /* ======= Song Card ======= */
 .song-card {
-position: relative;
-width: 100%;
-height: 100vh;
-scroll-snap-align: start;
-display: flex;
-justify-content: center;
-align-items: center;
-border-bottom: 1px solid #222;
+  position: relative;
+  height: 100vh;               /* full viewport height */
+  width: 100%;                 /* full width */
+  scroll-snap-align: start;    /* snap on top */
+  border-bottom: 2px solid #fff; /* or any border to separate cards */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
 }
 
-/* ======= Song Cover Image ======= */
 .song-card img.song-img {
-width: 100%;
-height: 100%;
-object-fit: cover;
-display: block;
-border-bottom: 1px solid #222;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;  /* cover full card without distortion */
 }
 
 /* ======= Play Overlay ======= */
@@ -56,19 +53,16 @@ pointer-events: none;
 
 /* ======= Send Button ======= */
 .song-card .sendBtn {
-position: absolute;
-bottom: 30px;
-left: 50%;
-transform: translateX(-50%);
-padding: 12px 24px;
-background: rgba(255, 255, 255, 0.9);
-color: #000;
-border: none;
-border-radius: 25px;
-font-weight: bold;
-cursor: pointer;
-transition: background 0.3s;
-z-index: 10;
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 10px 20px;
+  background-color: rgba(255,255,255,0.8);
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .song-card .sendBtn:hover {
@@ -127,3 +121,4 @@ border-radius: 12px;
 cursor: pointer;
 font-weight: bold;
 }
+
