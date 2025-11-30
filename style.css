@@ -1,22 +1,18 @@
 /* ===============================
    GENERAL STYLES
    =============================== */
-body {
+body, html {
   margin: 0;
+  padding: 0;
+  height: 100%;
   font-family: 'Arial', sans-serif;
   background-color: #000;
   color: #fff;
   overflow-x: hidden;
 }
 
-button {
-  cursor: pointer;
-  outline: none;
-  border: none;
-}
-
 /* ===============================
-   COUNTDOWN
+   COUNTDOWN FIXED TOP
    =============================== */
 #countdown {
   position: fixed;
@@ -35,12 +31,12 @@ button {
    SONG FEED - TikTok style
    =============================== */
 .song-feed {
-  display: flex;
-  flex-direction: column;
   height: 100vh;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
+  margin: 0;
+  padding: 0;
 }
 
 .song-card {
@@ -49,7 +45,7 @@ button {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 100vh; /* full viewport */
   width: 100%;
   position: relative;
   padding: 20px;
@@ -74,7 +70,9 @@ button {
   pointer-events: none;
 }
 
-/* Send button fixed at bottom center */
+/* ===============================
+   SEND BUTTON
+   =============================== */
 .song-card .sendBtn {
   position: absolute;
   bottom: 40px;
@@ -87,6 +85,7 @@ button {
   border-radius: 30px;
   font-size: 16px;
   transition: 0.2s;
+  z-index: 10;
 }
 
 .song-card .sendBtn:hover {
@@ -109,6 +108,7 @@ button {
   display: none; /* hidden by default */
   max-width: 90%;
   text-align: center;
+  animation: fadeIn 0.3s;
 }
 
 .popup h2 {
@@ -121,6 +121,7 @@ button {
   padding: 10px 20px;
   border-radius: 20px;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .popup button.closeBtn:hover {
@@ -128,22 +129,9 @@ button {
 }
 
 /* ===============================
-   INTRO POPUP
+   POPUP ANIMATION
    =============================== */
-#introPopup {
-  display: block; /* visible on page load, JS will hide after 5s */
-}
-
-/* ===============================
-   ABOUT POPUP
-   =============================== */
-#aboutPopup {
-  display: none; /* only shows when About button clicked */
-}
-
-/* ===============================
-   MESSAGE POPUP
-   =============================== */
-#messagePopup {
-  display: none; /* only shows when Send button clicked */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -60%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
 }
