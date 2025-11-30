@@ -14,40 +14,34 @@
   <div id="songFeed"></div>
 
   <!-- Intro Popup (shows on page load for 5 sec) -->
-  <div id="introPopup" class="popup">
-    <div class="popup-content">
-      <h2>TeaHug 🫖</h2>
-      <p>
-        "Set the MOOD with SURPRISES... not MESSAGES"<br>
-        Pick a song snippet. Choose your vibe. We deliver it during Hug Hour (9PM-12AM)!
-      </p>
-    </div>
-  </div>
+<!-- INTRO POPUP (shows on page load) -->
+<div id="introPopup" class="popup">
+  Welcome to TeaHug! 🎵
+</div>
 
-  <!-- About Popup -->
-  <div id="aboutPopup" class="popup hidden">
-    <div class="popup-content">
-      <h2>About TeaHug</h2>
-      <p>
-        Set the MOOD with SURPRISES... not MESSAGES.<br>
-        Free • No Signup • Just Good Vibes
-      </p>
-      <button onclick="closeAbout()">Close</button>
-    </div>
-  </div>
+<!-- ABOUT POPUP (only shows when About button is clicked) -->
+<div id="aboutPopup" class="popup hidden">
+  <h2>About TeaHug 🫖</h2>
+  <p>
+    "Set the MOOD with SURPRISES... not MESSAGES"<br>
+    Pick a song vibe. Set the mood. We deliver the surprise during nightly Hug Hours.<br>
+    Free • No Signup • Just Good Vibes
+  </p>
+  <button onclick="closeAbout()">Close</button>
+</div>
 
-  <!-- Message Popup -->
-  <div id="messagePopup" class="popup hidden">
-    <div class="popup-content">
-      <h3 id="songTitle">Song Title</h3>
-      <textarea id="userMessage" placeholder="Write your message..."></textarea>
-      <button id="sendMsgBtn">Send</button>
-      <button onclick="closeMessageForm()">Close</button>
-    </div>
-  </div>
+<!-- SEND MESSAGE POPUP (shows when user clicks Send button for a song) -->
+<div id="messagePopup" class="popup hidden">
+  <h2>Send a Hug 🎵</h2>
+  <p id="songTitle">Song Title</p>
+  <textarea id="userMessage" placeholder="Write your message..."></textarea>
+  <button id="sendMsgBtn">Send</button>
+  <button onclick="closeMessageForm()">Cancel</button>
+</div>
 
   <button id="aboutBtn" class="about-btn">About</button>
 
   <script type="module" src="main.js"></script>
 </body>
 </html>
+
