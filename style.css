@@ -1,93 +1,129 @@
-body, html {
+/* ===== Global Styles ===== */
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
   font-family: sans-serif;
   overflow-x: hidden;
+  scroll-behavior: smooth;
+  background-color: #111;
+  color: #fff;
 }
 
-.countdown {
+#countdown {
   position: fixed;
-  top: 0;
-  width: 100%;
-  padding: 12px;
-  background: rgba(0,0,0,0.8);
-  color: white;
-  text-align: center;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
+  font-size: 18px;
+  background: rgba(0,0,0,0.6);
+  padding: 6px 12px;
+  border-radius: 20px;
 }
 
+/* ===== Song Feed ===== */
 #songFeed {
-  margin-top: 50px;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
 }
 
 .song-card {
   height: 100vh;
-  width: 100%;
+  scroll-snap-align: start;
   position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background: #000;
-  color: #fff;
-  overflow: hidden;
+  justify-content: center;
+  flex-direction: column;
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  padding: 20px;
+  background-size: cover;
+  background-position: center;
 }
 
 .song-card img.song-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-height: 60%;
+  border-radius: 12px;
 }
 
 .play-overlay {
   position: absolute;
-  font-size: 50px;
-  color: rgba(255,255,255,0.8);
-  cursor: pointer;
+  font-size: 48px;
+  color: #fff;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
+/* Send Button */
 .sendBtn {
-  position: absolute;
-  bottom: 50px;
-  right: 20px;
-  padding: 12px 20px;
-  background: #ff5c5c;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #ff4081;
   border: none;
-  border-radius: 25px;
-  color: white;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
+.sendBtn:hover { transform: scale(1.05); }
 
+/* ===== Popups ===== */
 .popup {
   position: fixed;
-  top:0;
-  left:0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  color: #fff;
+  border-radius: 12px;
+  padding: 20px;
   z-index: 2000;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  animation: fadeIn 0.5s;
 }
 
 .popup.hidden {
   display: none;
 }
 
-.popup-content {
-  background: white;
-  color: black;
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
+.popup-content h2, .popup-content h3 {
+  margin-top: 0;
 }
 
-.popup-content textarea {
-  resize: none;
-  margin: 10px 0;
-  padding: 8px;
+textarea {
+  width: 100%;
   height: 80px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  padding: 10px;
+  resize: none;
 }
+
+/* About button */
+.about-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: 50px;
+  border: none;
+  background: #6200ee;
+  color: #fff;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -60%);}
+  to { opacity: 1; transform: translate(-50%, -50%);}
+    }
