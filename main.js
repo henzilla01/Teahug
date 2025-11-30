@@ -171,15 +171,23 @@ function prevSong() {
   showSong(currentIndex);
 }
 
-// =====================
-// Open message form
-// =====================
+/* ===============================
+   OPEN SEND MESSAGE POPUP ONLY WHEN "SEND" BUTTON IS PRESSED
+   =============================== */
 function openMessageForm(song) {
-  songTitleEl.textContent = song.title;
+  songTitleEl.textContent = song.title || "(Untitled)";
   messagePopup.classList.remove("hidden");
 
+  // Set click handler fresh each time
   sendMsgBtn.onclick = () => sendEmail(song);
 }
+
+/* ===============================
+   CLOSE SEND POPUP
+   =============================== */
+window.closeMessageForm = function () {
+  messagePopup.classList.add("hidden");
+};
 
 // =====================
 // Send email (worker endpoint)
@@ -235,3 +243,4 @@ setInterval(updateCountdown, 1000);
 // =====================
 loadSongs();
 updateCountdown();
+
