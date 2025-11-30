@@ -2,10 +2,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebas
 import {
   getFirestore,
   collection,
-  getDocs
+  getDocs,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-// Firebase config
+/* ===== FIREBASE CONFIG - use your project values ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -18,229 +20,230 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// DOM Elements
+/* ===== DOM ===== */
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const aboutPopup = document.getElementById("aboutPopup");
-const messagePopup = document.getElementById("messagePopup");
 const aboutBtn = document.getElementById("aboutBtn");
-const countdownEl = document.getElementById("countdown");
+const messagePopup = document.getElementById("messagePopup");
 const songTitleEl = document.getElementById("songTitle");
 const userMsgInput = document.getElementById("userMessage");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
+const countdownEl = document.getElementById("countdown");
 
+/* ===== Worker endpoint for messages - replace if different ===== */
+const MESSAGE_WORKER = "https://teahug.workers.dev/send";
+
+/* ===== State ===== */
 let allSongs = [];
-let currentIndex = 0;
 let audioPlayers = [];
+let currentIndex = 0;
 
-// =====================
-// Intro popup auto-hide
-// =====================
+/* ===== Intro popup show/hide ===== */
+introPopup.classList.remove("hidden");
 setTimeout(() => introPopup.classList.add("hidden"), 5000);
 
-// =====================
-// About popup
-// =====================
-aboutBtn.addEventListener("click", () => {
-  aboutPopup.classList.remove("hidden");
-});
+/* ===== About popup logic ===== */
+aboutBtn.addEventListener("click", () => aboutPopup.classList.remove("hidden"));
+window.closeAbout = () => aboutPopup.classList.add("hidden");
 
-window.closeAbout = function () {
-  aboutPopup.classList.add("hidden");
-};
+/* ===== Message popup logic ===== */
+window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
-// =====================
-// Message popup
-// =====================
-window.closeMessageForm = function () {
-  messagePopup.classList.add("hidden");
-};
-
-// =====================
-// Load songs from Firestore
-// =====================
+/* ===== Load songs from Firestore ===== */
 async function loadSongs() {
-  const snapshot = await getDocs(collection(db, "songs"));
-  allSongs = [];
-  snapshot.forEach(doc => {
-    allSongs.push({ id: doc.id, ...doc.data() });
-  });
-
-  shuffleSongs();
+  // order by timestamp desc (newest first)
+  const q = query(collection(db, "songs"), orderBy("timestamp", "desc"));
+  const snap = await getDocs(q);
+  allSongs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   buildFeed();
-  showSong(0);
+  if (audioPlayers.length) playSong(0);
 }
 
-// Shuffle songs randomly
-function shuffleSongs() {
-  for (let i = allSongs.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
-  }
-}
-
-// =====================
-// Build TikTok-style feed
-// =====================
 function buildFeed() {
   songFeed.innerHTML = "";
   audioPlayers = [];
 
-  allSongs.forEach((song, i) => {
+  allSongs.forEach((s, i) => {
     const card = document.createElement("div");
-    card.classList.add("song-card");
-    card.style.height = "100vh"; // full viewport height
+    card.className = "song-card";
 
-    card.innerHTML = `
-      <img src="${song.coverURL}" class="song-img">
-      <div class="play-overlay">▶</div>
-      <button class="sendBtn">Send</button>
+    // cover image element
+    const img = document.createElement("img");
+    img.className = "cover";
+    img.src = s.coverURL || "";
+    img.alt = s.title || "cover";
+
+    // content overlay
+    const content = document.createElement("div");
+    content.className = "card-content";
+    content.innerHTML = `
+      <div class="meta">
+        <div style="font-weight:800; font-size:18px;">${s.title || "Untitled"}</div>
+        <div style="opacity:0.9; margin-top:6px;">${s.artist || ""}</div>
+      </div>
     `;
 
-    const audio = new Audio(song.songURL);
+    // play overlay + send button
+    const playOverlay = document.createElement("div");
+    playOverlay.className = "play-overlay";
+    playOverlay.textContent = "▶";
+
+    const sendBtn = document.createElement("button");
+    sendBtn.className = "send-btn";
+    sendBtn.textContent = "Send";
+
+    // audio player (not attached to DOM)
+    const audio = new Audio(s.songURL);
     audio.loop = true;
     audioPlayers.push(audio);
 
-    // Send button
-    card.querySelector(".sendBtn").onclick = () => openMessageForm(song);
+    // card assembly
+    card.appendChild(img);
+    card.appendChild(content);
+    card.appendChild(playOverlay);
+    card.appendChild(sendBtn);
+    songFeed.appendChild(card);
 
-    // Tap to play/pause
-    const playOverlay = card.querySelector(".play-overlay");
-    card.addEventListener("click", (e) => {
-      if (e.target !== card.querySelector(".sendBtn")) {
-        if (audio.paused) {
-          audio.play();
-          playOverlay.style.display = "none";
-        } else {
-          audio.pause();
-          playOverlay.style.display = "block";
-        }
+    // Tap card to toggle play/pause
+    card.addEventListener("click", (ev) => {
+      // if user clicked the "Send" button, we ignore toggle here
+      if (ev.target === sendBtn) return;
+      if (audio.paused) {
+        stopAll();
+        audio.play();
+        playOverlay.style.display = "none";
+      } else {
+        audio.pause();
+        playOverlay.style.display = "block";
       }
     });
 
-    songFeed.appendChild(card);
+    // Send button opens message popup ONLY
+    sendBtn.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      openMessageForm(s);
+    });
   });
 
   enableSwipe();
 }
 
-// =====================
-// Swipe navigation
-// =====================
+/* ===== Swipe navigation for mobile ===== */
 function enableSwipe() {
   let startY = 0;
-  let endY = 0;
-
-  songFeed.addEventListener("touchstart", (e) => {
-    startY = e.touches[0].clientY;
-  });
-
+  songFeed.addEventListener("touchstart", (e) => startY = e.touches[0].clientY);
   songFeed.addEventListener("touchend", (e) => {
-    endY = e.changedTouches[0].clientY;
+    const endY = e.changedTouches[0].clientY;
     if (startY - endY > 80) nextSong();
     if (endY - startY > 80) prevSong();
   });
+
+  // handle desktop scroll snap -> update playing item
+  songFeed.addEventListener("scroll", throttle(() => {
+    const idx = Math.round(songFeed.scrollTop / window.innerHeight);
+    if (idx !== currentIndex) {
+      currentIndex = idx;
+      stopAll();
+      if (audioPlayers[currentIndex]) audioPlayers[currentIndex].play();
+    }
+  }, 120));
 }
 
-// Show song at index
-function showSong(i) {
-  stopAll();
-  currentIndex = i;
-  songFeed.children[i].scrollIntoView({ behavior: "smooth" });
-  audioPlayers[i].play();
+/* throttle helper */
+function throttle(fn, wait) {
+  let t = null;
+  return (...args) => {
+    if (t) return;
+    t = setTimeout(() => { fn(...args); t = null; }, wait);
+  };
 }
 
-// Stop all audio
-function stopAll() {
-  audioPlayers.forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
-}
-
-// Next / Previous song
+/* navigation */
 function nextSong() {
-  currentIndex++;
-  if (currentIndex >= allSongs.length) currentIndex = 0;
-  showSong(currentIndex);
+  currentIndex = Math.min(audioPlayers.length - 1, currentIndex + 1);
+  scrollTo(currentIndex);
+  stopAll();
+  if (audioPlayers[currentIndex]) audioPlayers[currentIndex].play();
 }
-
 function prevSong() {
-  currentIndex--;
-  if (currentIndex < 0) currentIndex = allSongs.length - 1;
-  showSong(currentIndex);
+  currentIndex = Math.max(0, currentIndex - 1);
+  scrollTo(currentIndex);
+  stopAll();
+  if (audioPlayers[currentIndex]) audioPlayers[currentIndex].play();
+}
+function scrollTo(i) {
+  const child = songFeed.children[i];
+  if (child) child.scrollIntoView({ behavior: "smooth" });
 }
 
-/* ===============================
-   OPEN SEND MESSAGE POPUP ONLY WHEN "SEND" BUTTON IS PRESSED
-   =============================== */
+/* stop all audio */
+function stopAll() {
+  audioPlayers.forEach(a => { try { a.pause(); a.currentTime = 0; } catch(e){} });
+}
+
+/* open message popup for a specific song */
 function openMessageForm(song) {
-  songTitleEl.textContent = song.title || "(Untitled)";
+  songTitleEl.textContent = song.title || "Untitled";
   messagePopup.classList.remove("hidden");
 
-  // Set click handler fresh each time
-  sendMsgBtn.onclick = () => sendEmail(song);
+  // set fresh handler
+  sendMsgBtn.onclick = () => sendMessage(song);
 }
 
-/* ===============================
-   CLOSE SEND POPUP
-   =============================== */
-window.closeMessageForm = function () {
-  messagePopup.classList.add("hidden");
-};
-
-// =====================
-// Send email (worker endpoint)
-// =====================
-async function sendEmail(song) {
-  const message = userMsgInput.value.trim();
+/* send message to your worker endpoint (blocks during Hug Hour) */
+async function sendMessage(song) {
+  const message = (userMsgInput.value || "").trim();
   if (!message) return alert("Please type a message.");
 
-  const payload = {
-    title: song.title,
-    message
-  };
+  const now = new Date();
+  const hour = now.getHours();
+  // Hug Hour is 21:00 - 23:59 (9PM-12AM)
+  if (hour >= 21 && hour < 24) {
+    return alert("Messages cannot be sent during Hug Hour (9PM–12AM).");
+  }
 
-  const res = await fetch("https://teahug.workers.dev/send", {
-    method: "POST",
-    body: JSON.stringify(payload)
-  });
+  // POST to worker
+  try {
+    const payload = { title: song.title || "Untitled", message };
+    const res = await fetch(MESSAGE_WORKER, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-  if (res.ok) {
-    alert("Message sent ❤️");
-    messagePopup.classList.add("hidden");
-    userMsgInput.value = "";
-  } else {
+    if (res.ok) {
+      alert("Message sent ❤️");
+      userMsgInput.value = "";
+      messagePopup.classList.add("hidden");
+    } else {
+      alert("Failed to send message.");
+    }
+  } catch (err) {
+    console.error(err);
     alert("Failed to send message.");
   }
 }
 
-// =====================
-// Hug Hour countdown (9PM–12AM)
-// =====================
+/* ===== Hug Hour countdown ===== */
 function updateCountdown() {
   const now = new Date();
   const currentHour = now.getHours();
-  const target = new Date();
-  target.setHours(21, 0, 0, 0);
-
   if (currentHour >= 21 && currentHour < 24) {
     countdownEl.textContent = "Hug Hour Active ❤️";
     return;
   }
-
-  let diff = target - now;
-  if (diff < 0) diff += 24 * 60 * 60 * 1000; // next day
+  const next = new Date();
+  next.setHours(21,0,0,0);
+  if (next <= now) next.setDate(next.getDate() + 1);
+  const diff = next - now;
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
-  countdownEl.textContent = `${h}h ${m}m to Hug Hour`;
+  const s = Math.floor((diff % 60000) / 1000);
+  countdownEl.textContent = `${h}h ${m}m ${s}s to Hug Hour`;
 }
-
 setInterval(updateCountdown, 1000);
 
-// =====================
-// Start
-// =====================
+/* start */
 loadSongs();
 updateCountdown();
-
