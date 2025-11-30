@@ -1,242 +1,141 @@
-/* ===============================
-   GENERAL RESET
-   =============================== */
+/* RESET */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: "Poppins", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-body, html {
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  background: #000;
-  color: #fff;
+html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: Arial, sans-serif;
 }
 
-/* ===============================
-   SONG FEED - TIKTOK STYLE
-   =============================== */
-#songFeed {
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory;
+/* HEADER */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #111;
+    padding: 12px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    z-index: 10;
 }
 
-.song-card {
-  width: 100%;
-  height: 100vh;
-  position: relative;
-  scroll-snap-align: start;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #111;
-}
-
-.song-card img.song-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.play-overlay {
-  position: absolute;
-  font-size: 4rem;
-  color: #fff;
-  text-shadow: 0 0 20px #000;
-  pointer-events: none;
-}
-
-/* ===============================
-   SEND BUTTON
-   =============================== */
-.sendBtn {
-  position: absolute;
-  bottom: 80px;
-  right: 20px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid #fff;
-  padding: 10px 20px;
-  border-radius: 25px;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.sendBtn:hover {
-  background: rgba(255,255,255,0.2);
-  transform: scale(1.05);
-}
-
-/* ===============================
-   POPUPS
-   =============================== */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backdrop-filter: blur(8px);
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.popup.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.popup-content {
-  background: #222;
-  padding: 25px 35px;
-  border-radius: 15px;
-  max-width: 90%;
-  text-align: center;
-  color: #fff;
-}
-
-.popup-content h2 {
-  margin-bottom: 10px;
-  font-size: 1.5rem;
-}
-
-.popup-content p {
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.popup-content button.close-btn {
-  margin-top: 15px;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 10px;
-  background: #fff;
-  color: #000;
-  cursor: pointer;
-}
-
-/* ===============================
-   COUNTDOWN TIMER
-   =============================== */
-#countdown {
-  position: fixed;
-  top: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.1);
-  padding: 5px 15px;
-  border-radius: 20px;
-  font-weight: bold;
-  z-index: 1000;
-}
-
-/* ===============================
-   ABOUT BUTTON
-   =============================== */
 #aboutBtn {
-  position: fixed;
-  top: 15px;
-  right: 15px;
-  background: rgba(255,255,255,0.1);
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease;
+    background: #7a54ff;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
-#aboutBtn:hover {
-  background: rgba(255,255,255,0.2);
+/* TIKTOK FEED */
+#feed {
+    position: absolute;
+    top: 60px;
+    bottom: 90px;
+    width: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
 }
 
-/* ===============================
-   AUDIO ELEMENTS (hidden)
-   =============================== */
+.songCard {
+    height: calc(100vh - 90px);
+    width: 100%;
+    scroll-snap-align: start;
+    position: relative;
+    background: #111;
+    border-bottom: 1px solid #222;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.songCard h3 {
+    color: white;
+    margin-bottom: 10px;
+}
+
 audio {
-  display: none;
+    width: 90%;
+    margin-top: 10px;
 }
 
-/* ===============================
-   RESPONSIVE
-   =============================== */
-@media (max-width: 768px) {
-  .sendBtn {
-    bottom: 60px;
-    right: 15px;
-    padding: 8px 18px;
-  }
-
-  .popup-content {
-    padding: 20px;
-  }
+/* SEND BUTTON */
+.send-btn {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #8b5cf6;
+    color: white;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 20;
 }
 
-/* === POPUP BASE STYLE === */
-
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
+/* POPUP SYSTEM */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.25s ease forwards;
 }
 
-.popup.hidden {
-  display: none;
-}
-}
-
-.popup-content {
-  width: 85%;
-  max-width: 380px;
-  background: #111;
-  border-radius: 14px;
-  padding: 20px;
-  color: white;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
+.popup-box {
+    background: #fff;
+    padding: 22px;
+    width: 85%;
+    max-width: 380px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.26);
+    opacity: 0;
+    transform: translateY(25px);
 }
 
-.message-box {
-  width: 100%;
-  height: 100px;
-  margin-top: 10px;
-  border-radius: 8px;
-  padding: 10px;
-  border: none;
-  outline: none;
+.popup-animate {
+    animation: popUp 0.35s ease forwards;
 }
 
-.closeBtn, .send-message-btn {
-  margin-top: 15px;
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  background: #ff4d6d;
-  border: none;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
+@keyframes popUp {
+    0% { opacity: 0; transform: translateY(25px) scale(0.93); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.closeBtn {
-  background: #444;
-  margin-top: 10px;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
+/* POPUP BUTTONS */
+.popup-box button {
+    margin-top: 15px;
+    padding: 10px 26px;
+    border: none;
+    background: #8b5cf6;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s ease;
+}
+
+.popup-box button:hover {
+    transform: scale(1.06);
+}
