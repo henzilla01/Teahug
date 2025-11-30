@@ -1,11 +1,9 @@
 /* ===============================
-   TEAHUG PUBLIC PAGE CSS
-   TikTok-style audio feed + pop-ups
+   TEAHUG - MAIN CSS
+   Fullscreen TikTok-style vertical feed
    =============================== */
 
-/* -------------------------------
-   RESET & BASE
--------------------------------- */
+/* Reset and base */
 * {
   margin: 0;
   padding: 0;
@@ -14,206 +12,167 @@
 }
 
 body, html {
-  width: 100%;
   height: 100%;
   overflow: hidden;
   background-color: #000;
   color: #fff;
 }
 
-/* -------------------------------
-   SONG FEED
--------------------------------- */
+/* ===============================
+   SONG FEED CONTAINER
+   Fullscreen vertical snap
+   =============================== */
 #songFeed {
-  display: flex;
-  flex-direction: column;
-  scroll-snap-type: y mandatory;
-  overflow-y: scroll;
   height: 100vh;
-  width: 100vw;
-  scroll-behavior: smooth;
+  width: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
 }
 
+/* ===============================
+   INDIVIDUAL SONG CARD
+   Fullscreen, centered content
+   =============================== */
 .song-card {
   position: relative;
-  width: 100vw;
   height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   scroll-snap-align: start;
-  border: 3px solid #fff; /* TikTok-style border */
-  border-radius: 16px;
-  margin: 16px 0;
+  border-bottom: 2px solid rgba(255,255,255,0.1);
+  background-color: #000;
   overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-  background-color: #111;
 }
 
-/* Cover image */
+/* ===============================
+   SONG IMAGE
+   Fullscreen, cover
+   =============================== */
 .song-card img.song-img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
+  z-index: 1;
 }
 
-/* Play overlay icon */
+/* ===============================
+   PLAY OVERLAY
+   Big play button on top of cover
+   =============================== */
 .song-card .play-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 64px;
+  font-size: 5rem;
   color: rgba(255,255,255,0.8);
-  pointer-events: none;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  z-index: 2;
+  cursor: pointer;
 }
 
-/* -------------------------------
+/* ===============================
    SEND BUTTON
--------------------------------- */
+   Bottom center of the card
+   =============================== */
 .song-card .sendBtn {
   position: absolute;
-  bottom: 24px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 14px 28px;
-  background-color: #ff2d55;
+  z-index: 2;
+  padding: 12px 25px;
+  background-color: #ff2e63;
   color: #fff;
   border: none;
-  border-radius: 28px;
-  font-size: 16px;
+  border-radius: 25px;
+  font-size: 1rem;
   cursor: pointer;
-  z-index: 10;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .song-card .sendBtn:hover {
-  transform: translateX(-50%) scale(1.1);
-  background-color: #ff4b78;
+  background-color: #ff5370;
+  transform: translateX(-50%) scale(1.05);
 }
 
-/* -------------------------------
-   COUNTDOWN
--------------------------------- */
-#countdown {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #fff;
-  font-size: 20px;
-  font-weight: bold;
-  z-index: 1000;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+/* ===============================
+   AUDIO CONTROLS (hidden)
+   =============================== */
+.song-card audio {
+  display: none;
 }
 
-/* -------------------------------
+/* ===============================
    POPUPS
--------------------------------- */
+   =============================== */
 .popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.95);
+  background-color: rgba(0,0,0,0.85);
   color: #fff;
-  padding: 24px 32px;
-  border-radius: 16px;
+  padding: 25px 35px;
+  border-radius: 15px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.5);
   z-index: 999;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  text-align: center;
+  display: none;
   max-width: 90%;
+  text-align: center;
+  animation: popupAppear 0.5s ease-in-out;
 }
 
-.popup.active {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translate(-50%, -50%) scale(1);
+.popup.show {
+  display: block;
 }
 
-/* Popup headings */
-.popup h2 {
-  margin-bottom: 12px;
-  font-size: 22px;
+@keyframes popupAppear {
+  from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
-/* Popup text */
-.popup p {
-  font-size: 16px;
-  line-height: 1.4;
-}
-
-/* Input inside send popup */
-.popup input, .popup textarea {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-size: 16px;
-}
-
-/* Send popup button */
-.popup button {
-  padding: 10px 24px;
-  background-color: #ff2d55;
-  border: none;
-  border-radius: 24px;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.2s ease;
-}
-
-.popup button:hover {
-  background-color: #ff4b78;
-}
-
-/* -------------------------------
+/* ===============================
    ABOUT BUTTON
--------------------------------- */
+   Always visible top right
+   =============================== */
 #aboutBtn {
   position: fixed;
-  bottom: 20px;
+  top: 20px;
   right: 20px;
-  z-index: 1000;
-  padding: 12px 20px;
-  border-radius: 20px;
-  background-color: rgba(255,45,85,0.9);
+  z-index: 999;
+  padding: 10px 20px;
   border: none;
-  font-size: 16px;
-  cursor: pointer;
+  background-color: rgba(255,255,255,0.1);
   color: #fff;
-  transition: transform 0.2s ease;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 #aboutBtn:hover {
-  transform: scale(1.1);
+  background-color: rgba(255,255,255,0.3);
 }
 
-/* -------------------------------
-   AUDIO ELEMENTS (hidden)
--------------------------------- */
-audio {
-  display: none;
-}
-
-/* -------------------------------
-   MOBILE OPTIMIZATION
--------------------------------- */
-@media (max-width: 768px) {
-  .song-card .sendBtn {
-    padding: 12px 20px;
-    font-size: 14px;
-  }
-
-  #countdown {
-    font-size: 16px;
-  }
-
-  .popup {
-    padding: 20px;
-  }
+/* ===============================
+   COUNTDOWN
+   Top center
+   =============================== */
+#countdown {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  font-size: 1.2rem;
+  background-color: rgba(0,0,0,0.5);
+  padding: 8px 15px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: bold;
 }
