@@ -1,13 +1,11 @@
 /* ===============================
    TEAHUG MAIN JAVASCRIPT
-   TikTok-style audio feed + email message
    =============================== */
 
-/* ==== FIREBASE SETUP ==== */
-// Make sure you included Firebase scripts in HTML:
-// <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-// <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// 🔹 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -17,10 +15,10 @@ const firebaseConfig = {
   appId: "1:540501854830:web:7249bb97b50582fe97747f"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-/* ==== DOM ELEMENTS ==== */
+// DOM elements
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const aboutPopup = document.getElementById("aboutPopup");
@@ -37,155 +35,135 @@ let songElements = [];
 let audioPlayers = [];
 
 /* ===============================
-   INTRO POPUP AUTO-HIDE (5 sec)
+   POPUP HANDLING
    =============================== */
-setTimeout(() => introPopup.classList.add("hidden"), 5000);
+setTimeout(() => introPopup.classList.add("hidden"), 5000); // intro popup auto-close 5 sec
 
-/* ===============================
-   ABOUT POPUP
-   =============================== */
 aboutBtn.addEventListener("click", () => {
   aboutPopup.classList.remove("hidden");
 });
+
 window.closeAbout = function () {
   aboutPopup.classList.add("hidden");
 };
 
-/* ===============================
-   MESSAGE POPUP OPEN/CLOSE
-   =============================== */
 window.closeMessageForm = function () {
   messagePopup.classList.add("hidden");
 };
 
 /* ===============================
-   LOAD SONGS FROM FIRESTORE
+   LOAD SONGS
    =============================== */
 async function loadSongs() {
-  const snapshot = await db.collection("songs").get();
-  snapshot.forEach(doc => {
-    allSongs.push({ id: doc.id, ...doc.data() });
-  });
-  shuffleSongs();
+  const snapshot = await getDocs(collection(db, "songs"));
+  allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
   buildFeed();
   playSong(0);
 }
 
-/* ==== RANDOM SHUFFLE ==== */
-function shuffleSongs() {
-  for (let i = allSongs.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allSongs[i], allSongs[j]] = [allSongs[j], allSongs[i]];
-  }
-}
-
 /* ===============================
-   BUILD TIKTOK-STYLE FEED
+   BUILD FEED
    =============================== */
 function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
   audioPlayers = [];
 
-  allSongs.forEach(song => {
+  allSongs.forEach((song, index) => {
     const card = document.createElement("div");
     card.classList.add("song-card");
 
     card.innerHTML = `
-      <img src="${song.cover}" class="song-img">
+      <img src="${song.coverURL}" class="song-img"/>
       <div class="play-overlay">▶</div>
       <button class="sendBtn">Send</button>
     `;
 
-    const audio = new Audio(song.url);
+    const audio = new Audio(song.songURL);
     audio.loop = true;
-
     audioPlayers.push(audio);
     songElements.push(card);
 
     // Send button click
-    card.querySelector(".sendBtn").addEventListener("click", e => {
-      e.stopPropagation(); // Prevent pausing
+    card.querySelector(".sendBtn").onclick = (e) => {
+      e.stopPropagation(); // prevent pause/play
       openMessageForm(song);
-    });
+    };
 
     // Tap to play/pause
+    const playOverlay = card.querySelector(".play-overlay");
     card.addEventListener("click", () => {
       if (audio.paused) {
         stopAll();
         audio.play();
-        card.querySelector(".play-overlay").style.display = "none";
+        playOverlay.style.display = "none";
       } else {
         audio.pause();
-        card.querySelector(".play-overlay").style.display = "block";
+        playOverlay.style.display = "block";
       }
     });
 
     songFeed.appendChild(card);
   });
 
-  enableSwipe();
+  enableScrollSnap();
 }
 
 /* ===============================
-   SWIPE NAVIGATION
+   SCROLL SNAP
    =============================== */
-function enableSwipe() {
-  let startY = 0;
-  let endY = 0;
-
-  songFeed.addEventListener("touchstart", e => startY = e.touches[0].clientY);
-  songFeed.addEventListener("touchend", e => {
-    endY = e.changedTouches[0].clientY;
-    if (startY - endY > 80) nextSong();
-    if (endY - startY > 80) prevSong();
+function enableScrollSnap() {
+  songFeed.addEventListener("scroll", () => {
+    const index = Math.round(songFeed.scrollTop / window.innerHeight);
+    if (index !== currentIndex) {
+      stopAll();
+      currentIndex = index;
+      audioPlayers[currentIndex]?.play();
+    }
   });
 }
 
-function nextSong() {
-  stopAll();
-  currentIndex = (currentIndex + 1) % songElements.length;
-  scrollToSong(currentIndex);
-  playSong(currentIndex);
-}
-
-function prevSong() {
-  stopAll();
-  currentIndex = (currentIndex - 1 + songElements.length) % songElements.length;
-  scrollToSong(currentIndex);
-  playSong(currentIndex);
-}
-
-function scrollToSong(i) {
-  songElements[i].scrollIntoView({ behavior: "smooth" });
-}
-
+/* ===============================
+   PLAY/STOP SONGS
+   =============================== */
 function playSong(i) {
   stopAll();
-  audioPlayers[i].play();
+  audioPlayers[i]?.play();
 }
 
 function stopAll() {
-  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
+  audioPlayers.forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
 }
 
 /* ===============================
-   MESSAGE FORM
+   OPEN MESSAGE FORM
    =============================== */
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
+
   sendMsgBtn.onclick = () => sendEmail(song);
 }
 
+/* ===============================
+   SEND MESSAGE (via Worker)
+   =============================== */
 async function sendEmail(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const payload = { title: song.title, message };
+  const payload = {
+    title: song.title,
+    message: message,
+  };
+
   const res = await fetch("https://teahug.workers.dev/send", {
     method: "POST",
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   if (res.ok) {
@@ -202,17 +180,19 @@ async function sendEmail(song) {
    =============================== */
 function updateCountdown() {
   const now = new Date();
+  const current = now.getHours();
+
   let target = new Date();
   target.setHours(21, 0, 0, 0);
 
-  if (now >= target) {
+  if (current >= 21) {
     countdownEl.textContent = "Hug Hour Active ❤️";
     return;
   }
 
-  const diff = target - now;
-  const h = Math.floor(diff / 3600000);
-  const m = Math.floor((diff % 3600000) / 60000);
+  let diff = target - now;
+  let h = Math.floor(diff / 3600000);
+  let m = Math.floor((diff % 3600000) / 60000);
   countdownEl.textContent = `${h}h ${m}m to Hug Hour`;
 }
 
