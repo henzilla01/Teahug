@@ -200,6 +200,7 @@ audio {
 .popup.hidden {
   display: none;
 }
+}
 
 .popup-content {
   width: 85%;
@@ -238,3 +239,4 @@ audio {
   background: #444;
   margin-top: 10px;
 }
+
