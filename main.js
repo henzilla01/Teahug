@@ -163,7 +163,9 @@ function sendViaWhatsApp(song) {
     `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`
   );
 
-  window.location.href = `https://wa.me/message/WU7FM2NLOXI6P1=${encoded}`;
+  // Direct message to your WhatsApp chat
+  window.location.href =
+    `https://wa.me/message/WU7FM2NLOXI6P1?text=${encoded}`;
 }
 
 /* ===============================
@@ -220,6 +222,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
