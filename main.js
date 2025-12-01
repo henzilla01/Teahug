@@ -153,7 +153,17 @@ function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
 
-  sendMsgBtn.onclick = () => sendEmail(song);
+  sendMsgBtn.onclick = () => sendViaWhatsApp(song);
+}
+function sendViaWhatsApp(song) {
+  const message = userMsgInput.value.trim();
+  if (!message) return alert("Please type a message.");
+
+  const encoded = encodeURIComponent(
+    `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`
+  );
+
+  window.location.href = `https://wa.me/message/WU7FM2NLOXI6P1=${encoded}`;
 }
 
 /* ===============================
@@ -210,5 +220,6 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
