@@ -171,20 +171,28 @@ function sendViaWhatsApp(song) {
 /* ===============================
    SEND MESSAGE (via Worker)
    =============================== */
-function sendViaWhatsApp(song) {
+async function sendEmail(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`;
-  const encodedMessage = encodeURIComponent(fullMessage);
+  const payload = {
+    title: song.title,
+    message: message,
+  };
 
-  // Open WhatsApp with the message pre-filled
-  window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+  const res = await fetch("https://teahug.workers.dev/send", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 
-  // Optional: close the message popup and clear input
-  messagePopup.classList.add("hidden");
-  userMsgInput.value = "";
+  if (res.ok) {
+    alert("Message sent ❤️");
+    messagePopup.classList.add("hidden");
+    userMsgInput.value = "";
+  } else {
+    alert("Failed to send message.");
   }
+}
 
 /* ===============================
    HUG HOUR COUNTDOWN
@@ -214,6 +222,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
