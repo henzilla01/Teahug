@@ -175,23 +175,19 @@ async function sendEmail(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const payload = {
-    title: song.title,
-    message: message,
-  };
+  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`;
 
-  const res = await fetch("https://teahug.workers.dev/send", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-
-  if (res.ok) {
-    alert("Message sent ❤️");
-    messagePopup.classList.add("hidden");
-    userMsgInput.value = "";
-  } else {
-    alert("Failed to send message.");
+  // Copy to clipboard
+  try {
+    await navigator.clipboard.writeText(fullMessage);
+    alert("Message copied to clipboard ✅");
+  } catch (err) {
+    console.error("Failed to copy:", err);
   }
+
+  // Open WhatsApp with the same message
+  const encoded = encodeURIComponent(fullMessage);
+  window.location.href = `https://wa.me/message/WU7FM2NLOXI6P1?text=${encoded}`;
 }
 
 /* ===============================
@@ -222,6 +218,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
