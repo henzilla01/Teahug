@@ -171,24 +171,20 @@ function sendViaWhatsApp(song) {
 /* ===============================
    SEND MESSAGE (via Worker)
    =============================== */
-async function sendEmail(song) {
+function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
   const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`;
+  const encodedMessage = encodeURIComponent(fullMessage);
 
-  // Copy to clipboard
-  try {
-    await navigator.clipboard.writeText(fullMessage);
-    alert("Message copied to clipboard ✅");
-  } catch (err) {
-    console.error("Failed to copy:", err);
+  // Open WhatsApp with the message pre-filled
+  window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+
+  // Optional: close the message popup and clear input
+  messagePopup.classList.add("hidden");
+  userMsgInput.value = "";
   }
-
-  // Open WhatsApp with the same message
-  const encoded = encodeURIComponent(fullMessage);
-  window.location.href = `https://wa.me/message/WU7FM2NLOXI6P1?text=${encoded}`;
-}
 
 /* ===============================
    HUG HOUR COUNTDOWN
@@ -218,6 +214,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
