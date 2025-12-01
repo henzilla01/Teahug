@@ -155,43 +155,30 @@ function openMessageForm(song) {
 
   sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
+
 function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const encoded = encodeURIComponent(
-    `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`
-  );
-
-  // Direct message to your WhatsApp chat
-  window.location.href =
-    `https://wa.me/message/WU7FM2NLOXI6P1?text=${encoded}`;
-}
-
-/* ===============================
-   SEND MESSAGE (via Worker)
-   =============================== */
-async function sendEmail(song) {
-  const message = userMsgInput.value.trim();
-  if (!message) return alert("Please type a message.");
-
-  const payload = {
-    title: song.title,
-    message: message,
-  };
-
-  const res = await fetch("https://teahug.workers.dev/send", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-
-  if (res.ok) {
-    alert("Message sent ❤️");
-    messagePopup.classList.add("hidden");
-    userMsgInput.value = "";
-  } else {
-    alert("Failed to send message.");
-  }
+  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`;
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(fullMessage)
+    .then(() => {
+      // Open WhatsApp link in a new tab
+      window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
+      
+      // Notify user
+      alert("Message copied! Paste it in WhatsApp to send.");
+      
+      // Close popup and reset input
+      messagePopup.classList.add("hidden");
+      userMsgInput.value = "";
+    })
+    .catch(err => {
+      alert("Failed to copy message. Please try again.");
+      console.error(err);
+    });
 }
 
 /* ===============================
@@ -222,6 +209,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
