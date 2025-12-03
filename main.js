@@ -55,30 +55,11 @@ window.closeMessageForm = function () {
    LOAD SONGS
    =============================== */
 async function loadSongs() {
-  const ref = collection(db, "songs");
-  const snapshot = await getDocs(ref);
+  const snapshot = await getDocs(collection(db, "songs"));
+  allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  allSongs = []; // reset array
-
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    allSongs.push({
-      id: doc.id,                                 // <-- Firestore doc id
-      title: data.title || data.name || "Untitled",
-      artist: data.artist || "",
-      songURL: data.songURL || data.url || data.audioUrl || data.audio || null,
-      coverURL: data.coverURL || data.cover || data.image || null
-    });
-  });
-
-  shuffleSongs();
   buildFeed();
-
-  // If you were auto-playing first song, keep that here:
   playSong(0);
-
-  // call deep-link handler AFTER feed is built
-  openSongFromURL();
 }
 
 /* ===============================
@@ -228,6 +209,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
