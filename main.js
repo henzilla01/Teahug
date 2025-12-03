@@ -1,6 +1,5 @@
 /* ===============================
    TEAHUG MAIN JAVASCRIPT
-   TikTok-style audio feed + WhatsApp share
    =============================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -61,24 +60,25 @@ async function loadSongs() {
 
   buildFeed();
 
-  // Wait for DOM elements to render
-  setTimeout(() => {
-    const params = new URLSearchParams(window.location.search);
-    const songId = params.get("song");
+  // Wait until the cards are in DOM
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-    let startIndex = 0;
-    if (songId) {
-      const index = allSongs.findIndex(s => s.id === songId);
-      if (index !== -1) startIndex = index;
-    }
+  // Check for song URL parameter
+  const params = new URLSearchParams(window.location.search);
+  const songId = params.get("song");
 
-    // Scroll and play
-    const card = songElements[startIndex];
-    if (card) {
-      card.scrollIntoView({ behavior: "auto" });
-      playSong(startIndex);
+  if (songId) {
+    const index = allSongs.findIndex(s => s.id === songId);
+    if (index !== -1) {
+      const card = songElements[index + 1]; // +1 for cloned first card
+      if (card) {
+        card.scrollIntoView({ behavior: "auto" });
+        playSong(index + 1);
+      }
     }
-  }, 100);
+  } else {
+    playSong(0);
+  }
 }
 
 /* ===============================
@@ -89,6 +89,7 @@ function buildFeed() {
   songElements = [];
   audioPlayers = [];
 
+  // Clone last and first for seamless infinite scroll
   const loopSongs = [allSongs[allSongs.length - 1], ...allSongs, allSongs[0]];
 
   loopSongs.forEach((song, index) => {
@@ -138,6 +139,7 @@ function enableInfiniteScroll() {
   songFeed.addEventListener("scroll", () => {
     const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
 
+    // Infinite loop adjustment
     if (scrollIndex === 0) {
       songFeed.scrollTop = allSongs.length * window.innerHeight;
       currentIndex = allSongs.length - 1;
@@ -148,6 +150,7 @@ function enableInfiniteScroll() {
       currentIndex = scrollIndex - 1;
     }
 
+    // Play the correct audio
     stopAll();
     audioPlayers[scrollIndex]?.play();
   });
@@ -171,7 +174,7 @@ function openMessageForm(song) {
 }
 
 /* ===============================
-   SEND VIA WHATSAPP
+   SEND MESSAGE VIA WHATSAPP
    =============================== */
 function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
@@ -179,6 +182,7 @@ function sendViaWhatsApp(song) {
 
   const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
 
+  // Copy to clipboard
   navigator.clipboard.writeText(fullMessage)
     .then(() => {
       window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
@@ -220,19 +224,3 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
