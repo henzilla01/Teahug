@@ -39,14 +39,6 @@ let audioPlayers = [];
    =============================== */
 setTimeout(() => introPopup.classList.add("hidden"), 5000); // intro popup auto-close 5 sec
 
-aboutBtn.addEventListener("click", () => {
-  aboutPopup.classList.remove("hidden");
-});
-
-window.closeAbout = function () {
-  aboutPopup.classList.add("hidden");
-};
-
 window.closeMessageForm = function () {
   messagePopup.classList.add("hidden");
 };
@@ -224,3 +216,4 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
