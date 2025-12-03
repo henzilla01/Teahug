@@ -1,6 +1,9 @@
 /* ===============================
    TEAHUG MAIN JAVASCRIPT
    =============================== */
+// Get song ID from URL, e.g. https://teahug1.pages.dev/song/Xne9e9hinBRachvvvjAn
+const pathParts = window.location.pathname.split("/");
+const songIdFromURL = pathParts[1] === "song" ? pathParts[2] : null;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -61,20 +64,7 @@ async function loadSongs() {
   buildFeed();
   playSong(0);
 }
-// After building the feed and initializing the song elements
-buildFeed();
-playSong(0);
 
-// If URL contains a specific song ID, scroll to it
-if (songIdFromURL) {
-  const index = allSongs.findIndex(s => s.id === songIdFromURL);
-  if (index !== -1) {
-    // Scroll feed to that song
-    currentIndex = index;
-    scrollToSong(index);
-    playSong(index);
-  }
-   }
 /* ===============================
    BUILD FEED
    =============================== */
@@ -221,6 +211,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
