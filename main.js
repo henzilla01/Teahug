@@ -1,9 +1,6 @@
 /* ===============================
    TEAHUG MAIN JAVASCRIPT
    =============================== */
-// Get song ID from URL, e.g. https://teahug1.pages.dev/song/Xne9e9hinBRachvvvjAn
-const pathParts = window.location.pathname.split("/");
-const songIdFromURL = pathParts[1] === "song" ? pathParts[2] : null;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -224,6 +221,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
