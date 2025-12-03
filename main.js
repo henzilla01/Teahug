@@ -160,8 +160,7 @@ function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${song.url}`;
-  
+  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: https://teahug1.pages.dev/song/${song.id}`;
   // Copy to clipboard
   navigator.clipboard.writeText(fullMessage)
     .then(() => {
@@ -209,6 +208,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
