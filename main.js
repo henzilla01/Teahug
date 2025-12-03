@@ -58,26 +58,29 @@ window.closeMessageForm = function () {
    LOAD SONGS
    =============================== */
 async function loadSongs() {
+async function loadSongs() {
+  // Load all songs from Firestore
   const snapshot = await getDocs(collection(db, "songs"));
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  // Build the feed
+  // Build the TikTok-style feed
   buildFeed();
-  playSong(0);
 
-  // ===== Step 2: Scroll to specific song from URL =====
-  // Get song ID from URL path: /song/<id>
-  const pathParts = window.location.pathname.split('/');
-  const songIdFromURL = pathParts.includes('song') ? pathParts[pathParts.indexOf('song') + 1] : null;
+  // Check if URL has a song ID
+  const params = new URLSearchParams(window.location.search);
+  const songId = params.get("song");
 
-  if (songIdFromURL) {
-    const index = allSongs.findIndex(s => s.id === songIdFromURL);
-    if (index !== -1) {
-      currentIndex = index;
-      scrollToSong(index);
-      playSong(index);
-    }
+  let startIndex = 0;
+
+  if (songId) {
+    const index = allSongs.findIndex(s => s.id === songId);
+    if (index !== -1) startIndex = index;
   }
+
+  // Scroll to and play the selected song
+  playSong(startIndex);
+  const card = songElements[startIndex];
+  if (card) card.scrollIntoView({ behavior: "auto" });
 }
 
 /* ===============================
@@ -174,21 +177,23 @@ function openMessageForm(song) {
   sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
 
+function getSongLink(song) {
+  const baseURL = window.location.origin; // e.g., https://teahug1.pages.dev
+  return `${baseURL}/?song=${song.id}`;
+}
+
 function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: https://teahug1.pages.dev/song/${song.id}`;
+  const songLink = getSongLink(song);
+  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nListen here: ${songLink}`;
+
   // Copy to clipboard
   navigator.clipboard.writeText(fullMessage)
     .then(() => {
-      // Open WhatsApp link in a new tab
       window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
-      
-      // Notify user
       alert("Message copied! Paste it in WhatsApp to send.");
-      
-      // Close popup and reset input
       messagePopup.classList.add("hidden");
       userMsgInput.value = "";
     })
@@ -226,6 +231,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
