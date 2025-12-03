@@ -58,33 +58,27 @@ window.closeMessageForm = function () {
    LOAD SONGS
    =============================== */
 async function loadSongs() {
-  // Load all songs from Firestore
+async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-  // Build the TikTok-style feed
+  // Build the feed
   buildFeed();
+  playSong(0);
 
-  // Wait a tiny moment for DOM to render cards
-  setTimeout(() => {
-    // Check if URL has a song ID
-    const params = new URLSearchParams(window.location.search);
-    const songId = params.get("song");
+  // ===== Step 2: Scroll to specific song from URL =====
+  // Get song ID from URL path: /song/<id>
+  const pathParts = window.location.pathname.split('/');
+  const songIdFromURL = pathParts.includes('song') ? pathParts[pathParts.indexOf('song') + 1] : null;
 
-    let startIndex = 0;
-    if (songId) {
-      const index = allSongs.findIndex(s => s.id === songId);
-      if (index !== -1) startIndex = index;
+  if (songIdFromURL) {
+    const index = allSongs.findIndex(s => s.id === songIdFromURL);
+    if (index !== -1) {
+      currentIndex = index;
+      scrollToSong(index);
+      playSong(index);
     }
-
-    // Scroll to and play the selected song
-    const card = songElements[startIndex];
-    if (card) {
-      card.scrollIntoView({ behavior: "auto" });
-      playSong(startIndex);
-    }
-  }, 100); // 100ms delay ensures songElements exist
-}
+  }
                                                    }
 
 /* ===============================
@@ -235,6 +229,7 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
 
 
 
