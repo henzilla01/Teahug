@@ -1,9 +1,7 @@
 /* ===============================
    TEAHUG MAIN JAVASCRIPT
+   TikTok-style audio feed + WhatsApp share
    =============================== */
-// Get song ID from URL, e.g. https://teahug1.pages.dev/song/Xne9e9hinBRachvvvjAn
-const pathParts = window.location.pathname.split("/");
-const songIdFromURL = pathParts[1] === "song" ? pathParts[2] : null;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -62,9 +60,26 @@ async function loadSongs() {
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   buildFeed();
-  playSong(0);
+
+  // Wait for DOM elements to render
+  setTimeout(() => {
+    const params = new URLSearchParams(window.location.search);
+    const songId = params.get("song");
+
+    let startIndex = 0;
+    if (songId) {
+      const index = allSongs.findIndex(s => s.id === songId);
+      if (index !== -1) startIndex = index;
+    }
+
+    // Scroll and play
+    const card = songElements[startIndex];
+    if (card) {
+      card.scrollIntoView({ behavior: "auto" });
+      playSong(startIndex);
+    }
+  }, 100);
 }
-                                                   }
 
 /* ===============================
    BUILD FEED
@@ -74,7 +89,6 @@ function buildFeed() {
   songElements = [];
   audioPlayers = [];
 
-  // Clone first and last songs for seamless infinite scroll
   const loopSongs = [allSongs[allSongs.length - 1], ...allSongs, allSongs[0]];
 
   loopSongs.forEach((song, index) => {
@@ -114,7 +128,7 @@ function buildFeed() {
     songFeed.appendChild(card);
   });
 
-  // Scroll to the "real" first song (index 1 because 0 is cloned last song)
+  // Scroll to first real song
   songFeed.scrollTop = window.innerHeight;
 
   enableInfiniteScroll();
@@ -124,20 +138,16 @@ function enableInfiniteScroll() {
   songFeed.addEventListener("scroll", () => {
     const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
 
-    // Jump to correct position for infinite effect
     if (scrollIndex === 0) {
-      // User scrolled to cloned last song
       songFeed.scrollTop = allSongs.length * window.innerHeight;
       currentIndex = allSongs.length - 1;
     } else if (scrollIndex === songElements.length - 1) {
-      // User scrolled to cloned first song
       songFeed.scrollTop = window.innerHeight;
       currentIndex = 0;
     } else {
-      currentIndex = scrollIndex - 1; // Adjust for cloned card
+      currentIndex = scrollIndex - 1;
     }
 
-    // Play the correct audio
     stopAll();
     audioPlayers[scrollIndex]?.play();
   });
@@ -160,19 +170,15 @@ function openMessageForm(song) {
   sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
 
-function getSongLink(song) {
-  const baseURL = window.location.origin; // e.g., https://teahug1.pages.dev
-  return `${baseURL}/?song=${song.id}`;
-}
-
+/* ===============================
+   SEND VIA WHATSAPP
+   =============================== */
 function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
-  const songLink = getSongLink(song);
-  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nListen here: ${songLink}`;
+  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
 
-  // Copy to clipboard
   navigator.clipboard.writeText(fullMessage)
     .then(() => {
       window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
@@ -214,10 +220,6 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
-
-
-
-
 
 
 
