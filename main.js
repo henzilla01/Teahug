@@ -193,27 +193,32 @@ function sendViaWhatsApp(song) {
    =============================== */
 function updateCountdown() {
   const now = new Date();
-  const current = now.getHours();
+  const currentHour = now.getHours();
 
   let target = new Date();
-  target.setHours(21, 0, 0, 0);
+  target.setHours(21, 0, 0, 0); // Hug Hour starts at 21:00
 
-  if (current >= 21) {
+  if (currentHour >= 21) {
     countdownEl.textContent = "Hug Hour Active ❤️";
     return;
   }
 
-  let diff = target - now;
-  let h = Math.floor(diff / 3600000);
-  let m = Math.floor((diff % 3600000) / 60000);
-  countdownEl.textContent = `${h}h ${m}m to Hug Hour`;
+  const diff = target - now; // difference in milliseconds
+  const h = Math.floor(diff / 3600000); // hours
+  const m = Math.floor((diff % 3600000) / 60000); // minutes
+  const s = Math.floor((diff % 60000) / 1000); // seconds
+
+  // Format with leading zeros
+  const formatted = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  countdownEl.textContent = formatted;
 }
 
+// Update every second
 setInterval(updateCountdown, 1000);
-
 /* ===============================
    START EVERYTHING
    =============================== */
 loadSongs();
 updateCountdown();
+
 
