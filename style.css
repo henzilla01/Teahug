@@ -12,7 +12,7 @@
 body {
   font-family: Arial, sans-serif;
   overflow: hidden; /* prevent default scrolling */
-  background-color: #000;
+  background-color: #000; /* black background like TikTok */
   color: #fff;
   height: 100vh;
 }
@@ -73,7 +73,7 @@ body {
   opacity: 1;
 }
 
-/* Message popup */
+/* Popups */
 .popup {
   position: fixed;
   top: 50%;
@@ -100,23 +100,24 @@ body {
   to {opacity: 1; transform: translate(-50%, -50%);}
 }
 
-/* Countdown Section */
+/* Countdown full-screen overlay */
 #countdown-section {
   height: 100vh;
   width: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   background: #000;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1000;
+  z-index: 2000;
+  flex-direction: column;
+  transition: opacity 0.5s ease;
 }
 
 .countdown-label {
-  font-size: 14px;
+  font-size: 16px;
   opacity: 0.7;
   margin-bottom: 10px;
 }
@@ -124,14 +125,14 @@ body {
 #countdownBig {
   font-size: 80px;
   font-weight: bold;
-  color: white;
+  letter-spacing: 3px;
+  color: #fff;
   text-shadow: 0 0 20px rgba(255,255,255,0.8);
   animation: pulse 2s infinite ease-in-out;
-  letter-spacing: 3px;
 }
 
 .countdown-sub {
-  font-size: 16px;
+  font-size: 18px;
   margin-top: 10px;
   opacity: 0.9;
 }
@@ -143,6 +144,7 @@ body {
   font-style: italic;
 }
 
+/* Smooth glowing pulse */
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.9; }
   50% { transform: scale(1.12); opacity: 1; }
