@@ -221,6 +221,55 @@ function updateHugHourCountdown() {
 
   countdownBig.textContent = `${h} : ${m} : ${s}`;
 }
+function updateHugHourCountdown() {
+    const now = new Date();
+
+    // Define Hug Hour start & end
+    const hugStart = new Date();
+    hugStart.setHours(19, 0, 0, 0); // 7 PM
+
+    const hugEnd = new Date();
+    hugEnd.setHours(22, 0, 0, 0); // 10 PM
+
+    const preHug = document.getElementById("preHugCountdown");
+    const hugTimer = document.getElementById("hugHourCountdown");
+    const countdownBig = document.getElementById("countdownBig");
+    const hugCountdownTimer = document.getElementById("hugCountdownTimer");
+
+    if (now >= hugStart && now < hugEnd) {
+        // Hug Hour ACTIVE
+        preHug.classList.add("hidden");
+        hugTimer.classList.remove("hidden");
+
+        // Countdown remaining Hug Hour time
+        const diff = hugEnd - now;
+        const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+        const minutes = String(Math.floor((diff / (1000 * 60)) % 60).padStart(2, "0"));
+        const seconds = String(Math.floor((diff / 1000) % 60).padStart(2, "0"));
+
+        hugCountdownTimer.textContent = `${hours} : ${minutes} : ${seconds}`;
+    } else {
+        // Pre-Hug countdown
+        hugTimer.classList.add("hidden");
+        preHug.classList.remove("hidden");
+
+        // Countdown to next 7 PM
+        if (now >= hugEnd) hugStart.setDate(hugStart.getDate() + 1);
+
+        const diff = hugStart - now;
+        const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+        const minutes = String(Math.floor((diff / (1000 * 60)) % 60).padStart(2, "0"));
+        const seconds = String(Math.floor((diff / 1000) % 60).padStart(2, "0"));
+
+        countdownBig.textContent = `${hours} : ${minutes} : ${seconds}`;
+    }
+}
+
+// Update every second
+setInterval(updateHugHourCountdown, 1000);
+
+// Run immediately
+updateHugHourCountdown();
 
 setInterval(updateHugHourCountdown, 1000);
 updateHugHourCountdown();
@@ -229,3 +278,4 @@ updateHugHourCountdown();
    START EVERYTHING
    =============================== */
 loadSongs();
+
