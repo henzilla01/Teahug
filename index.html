@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hugshour</title>
+  <title>TeaHug - Hug Hour</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Pre-Hug Hour Fullscreen Countdown -->
-  <div id="preHugSection" class="hidden">
+  <!-- FULLSCREEN PRE-HUG TIMER -->
+  <div id="preHugSection">
     <div id="preHugCountdownContainer">
       <div class="countdown-label">HugsHour will be LIVE in</div>
       <div id="preHugCountdown">00 : 00 : 00</div>
@@ -20,9 +20,9 @@
     </div>
   </div>
 
-  <!-- Regular top countdown (visible only during Hug Hour) -->
+  <!-- TOP TIMER DURING HUG HOUR -->
   <div id="hugHourTopCountdown" class="hidden">
-    <span id="hugCountdownTop">00 : 00 : 00</span>
+    <div class="top-countdown">Hug Hour Ends in: <span id="hugHourTimer">00:00:00</span></div>
   </div>
 
   <!-- Song Feed -->
@@ -31,14 +31,7 @@
   <!-- Intro Popup -->
   <div id="introPopup" class="popup intro-popup hidden">
     <h2>HugsHour is LIVE! 🎉</h2>
-    <p>
-      "Your 3-HOUR DAILY WINDOW for CONNECTIONS not MESSAGES<br>
-      - Set the mood for your hug in 3 simple steps:<br>
-      1. Pick your vibe (15-second song) Tap on "COPY LINK"<br>
-      2. Enter Recipient details<br>
-      3. Send the hug (via WhatsApp)<br>
-      No SIGNUP, No MESSAGES, Just HUGS!"
-    </p>
+    <p>Your 3-HOUR DAILY WINDOW for CONNECTIONS not MESSAGES</p>
   </div>
 
   <!-- Message Popup -->
