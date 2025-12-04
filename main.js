@@ -32,24 +32,11 @@ let allSongs = [];
 let songElements = [];
 let audioPlayers = [];
 let currentIndex = 0;
+let introPopupShown = false; // ensures intro popup only shows once per Hug Hour
 
 // -----------------
 // Popups
-let introTimeout;
 window.closeMessageForm = () => messagePopup.classList.add("hidden");
-
-// Show intro popup only during Hug Hour
-function showIntroPopup() {
-  introPopup.classList.remove("hidden");
-
-  // Clear previous timeout if exists
-  if (introTimeout) clearTimeout(introTimeout);
-
-  // Auto-hide after 10 seconds
-  introTimeout = setTimeout(() => {
-    introPopup.classList.add("hidden");
-  }, 10000); // 10 seconds
-}
 
 // -----------------
 // Load Songs
@@ -86,7 +73,7 @@ function buildFeed() {
       openMessageForm(song);
     };
 
-    // Play overlay
+    // Tap to play/pause
     card.addEventListener("click", () => {
       if (audio.paused) { 
         audio.play(); 
@@ -128,7 +115,6 @@ function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
   const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
-  
   navigator.clipboard.writeText(fullMessage)
     .then(() => {
       window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
@@ -161,30 +147,36 @@ function updateCountdown() {
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
 
     songFeed.style.display = "none";
-    introPopup.classList.add("hidden"); // hide intro before Hug Hour
+    introPopup.classList.add("hidden"); // Hide popup during pre-hug
   }
-  // HUG HOUR: 7 PM - 10 PM
+  // HUG HOUR: 7PM - 10PM
   else if (hour >= 19 && hour < 22) {
     preHugSection.style.display = "none";
     hugHourTopCountdown.classList.remove("hidden");
     songFeed.style.display = "block";
 
-    // Show intro popup for 10 seconds
-    showIntroPopup();
-
     let target = new Date();
     target.setHours(22,0,0,0);
     const diff = target - now;
+
     const h = String(Math.floor(diff / 3600000)).padStart(2,"0");
     const m = String(Math.floor((diff % 3600000)/60000)).padStart(2,"0");
     const s = String(Math.floor((diff % 60000)/1000)).padStart(2,"0");
     hugHourTimer.textContent = `${h}:${m}:${s}`;
+
+    // Show intro popup only once at start of Hug Hour
+    if (!introPopupShown) {
+      introPopup.classList.remove("hidden");
+      setTimeout(() => introPopup.classList.add("hidden"), 10000); // auto close 10s
+      introPopupShown = true;
+    }
   }
-  // POST-HUG: after 10 PM
+  // POST HUG: after 10 PM
   else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
+    introPopupShown = false; // reset for next day
   }
 }
 
