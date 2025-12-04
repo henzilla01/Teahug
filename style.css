@@ -1,171 +1,24 @@
-/* ===============================
-   TEAHUG STYLE.CSS
-   =============================== */
-
-/* Reset */
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-  background-color: #000;
-  color: #fff;
-  height: 100vh;
-}
+/* Reset & basic */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background: #000; color: #fff; overflow: hidden; height:100vh; }
 
 /* Song feed */
-.song-feed {
-  height: 100vh;
-  scroll-snap-type: y mandatory;
-  overflow-y: scroll;
-  display: none; /* hidden until Hug Hour */
-  position: relative;
-  z-index: 5;
-}
-
-/* Song card */
-.song-card {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  scroll-snap-align: start;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-bottom: 2px solid #333;
-}
-
-/* Song image */
-.song-card img.song-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Play overlay */
-.play-overlay {
-  position: absolute;
-  font-size: 4rem;
-  color: rgba(255,255,255,0.8);
-  cursor: pointer;
-}
-
-/* Send button */
-.sendBtn {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 12px 24px;
-  background-color: #ff0050;
-  color: #fff;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 1rem;
-  z-index: 500;
-  opacity: 0.9;
-  transition: opacity 0.2s;
-}
-.sendBtn:hover { opacity: 1; }
+.song-feed { height: 100vh; scroll-snap-type: y mandatory; overflow-y: scroll; }
+.song-card { position: relative; width: 100%; height: 100vh; scroll-snap-align: start; display: flex; justify-content: center; align-items: center; border-bottom: 2px solid #333; }
+.song-card img.song-img { width: 100%; height: 100%; object-fit: cover; }
+.play-overlay { position: absolute; font-size:4rem; color: rgba(255,255,255,0.8); cursor:pointer; }
+.sendBtn { position: absolute; bottom:30px; left:50%; transform:translateX(-50%); padding:12px 24px; background:#ff0050; border:none; border-radius:25px; color:#fff; cursor:pointer; z-index:500; opacity:0.9; transition: opacity 0.2s; }
+.sendBtn:hover { opacity:1; }
 
 /* Popups */
-.popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(0,0,0,0.95);
-  padding: 20px;
-  border-radius: 15px;
-  max-width: 90%;
-  max-height: 80%;
-  text-align: center;
-  z-index: 1000;
-  color: #fff;
-  animation: fadeIn 0.5s ease;
-}
-.popup.hidden { display: none; }
+.popup { position: fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color: rgba(0,0,0,0.95); padding:20px; border-radius:15px; max-width:90%; max-height:80%; text-align:center; z-index:10000; color:#fff; animation: fadeIn 0.5s ease; }
+.popup.hidden { display:none; }
+@keyframes fadeIn { from{opacity:0; transform:translate(-50%, -60%);} to{opacity:1; transform:translate(-50%, -50%);} }
 
-/* Animations */
-@keyframes fadeIn {
-  from {opacity: 0; transform: translate(-50%, -60%);}
-  to {opacity: 1; transform: translate(-50%, -50%);}
-}
+/* Pre-Hug fullscreen countdown */
+#preHugSection { position: fixed; top:0; left:0; width:100%; height:100vh; display:flex; justify-content:center; align-items:center; background:#000; z-index:9999; flex-direction:column; text-align:center; }
+#preHugCountdown { font-size: 80px; font-weight:bold; text-shadow:0 0 20px rgba(255,255,255,0.8); animation: pulse 2s infinite ease-in-out; margin:10px 0; }
+@keyframes pulse { 0%{transform:scale(1); opacity:0.9;} 50%{transform:scale(1.12);opacity:1;} 100%{transform:scale(1);opacity:0.9;} }
 
-/* Countdown full screen */
-#countdown-section {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100vh;
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 10;
-}
-
-#countdown-label { font-size: 14px; opacity: 0.7; margin-bottom: 10px; }
-#countdownBig { font-size: 80px; font-weight: bold; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.8); animation: pulse 2s infinite ease-in-out; letter-spacing: 3px; }
-.countdown-sub { font-size: 16px; margin-top: 10px; opacity: 0.9; }
-.countdown-tagline { margin-top: 6px; font-size: 14px; opacity: 0.8; font-style: italic; }
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.9; }
-}
-
-/* COUNTDOWN FULL SCREEN */
-#countdown-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  background-color: #000;
-  color: #fff;
-  flex-direction: column;
-  text-align: center;
-  z-index: 9999;
-}
-
-.countdown-label {
-  font-size: 16px;
-  opacity: 0.7;
-  margin-bottom: 10px;
-}
-
-#countdownBig {
-  font-size: 80px;
-  font-weight: 800;
-  letter-spacing: 3px;
-  margin: 0 0 10px 0;
-  animation: pulse 2s infinite ease-in-out;
-}
-
-.countdown-sub {
-  font-size: 16px;
-  margin-bottom: 5px;
-  opacity: 0.9;
-}
-
-.countdown-tagline {
-  font-size: 14px;
-  font-style: italic;
-  opacity: 0.8;
-}
-
-/* Smooth glowing pulse */
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.12); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.9; }
-}
-
-/* Hide song feed initially */
-#songFeed {
-  display: none;
-}
+/* Hug Hour top countdown */
+#hugHourTopCountdown { position: fixed; top:10px; width:100%; text-align:center; font-size:1.5rem; font-weight:bold; color:#fff; z-index:1000; text-shadow:0 0 10px rgba(255,255,255,0.7);}
