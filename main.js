@@ -18,12 +18,9 @@ const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const messagePopup = document.getElementById("messagePopup");
 const songTitleEl = document.getElementById("songTitle");
+const userMsgInput = document.getElementById("userMessage");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
-const recipientName = document.getElementById("recipientName");
-const recipientNumber = document.getElementById("recipientNumber");
-let selectedEmoji = "";
 
-// Countdown sections
 const preHugSection = document.getElementById("preHugSection");
 const preHugCountdown = document.getElementById("preHugCountdown");
 const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
@@ -34,29 +31,25 @@ let songElements = [];
 let audioPlayers = [];
 let currentIndex = 0;
 
-// Intro Popup auto-close 10s
-function showIntro() {
-  introPopup.classList.remove("hidden");
-  setTimeout(() => introPopup.classList.add("hidden"), 10000);
-}
-showIntro();
-
-// Close message form
+// -----------------
+// Popups
 window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
-// Load songs
+// -----------------
+// Load Songs
 async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   buildFeed();
 }
 
+// -----------------
 // Build Feed
 function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
   audioPlayers = [];
-
+  
   const loopSongs = [allSongs[allSongs.length -1], ...allSongs, allSongs[0]];
 
   loopSongs.forEach((song, index) => {
@@ -64,92 +57,135 @@ function buildFeed() {
     card.classList.add("song-card");
     card.innerHTML = `<img src="${song.coverURL}" class="song-img">
                       <div class="play-overlay">▶</div>
-                      <button class="sendBtn">Select</button>`;
+                      <button class="sendBtn">Select</button>`; // Button text changed to Select
     
     const audio = new Audio(song.songURL);
     audio.loop = true;
     audioPlayers.push(audio);
     songElements.push(card);
 
-    card.querySelector(".sendBtn").onclick = e => { e.stopPropagation(); openMessageForm(song); };
+    // Send button
+    card.querySelector(".sendBtn").onclick = e => {
+      e.stopPropagation();
+      openMessageForm(song);
+    };
+
+    // Play overlay
     card.addEventListener("click", () => {
-      if (audio.paused) { audio.play(); card.querySelector(".play-overlay").style.display="none"; }
-      else { audio.pause(); card.querySelector(".play-overlay").style.display="block"; }
+      if (audio.paused) { 
+        audio.play(); 
+        card.querySelector(".play-overlay").style.display = "none"; 
+      }
+      else { 
+        audio.pause(); 
+        card.querySelector(".play-overlay").style.display = "block"; 
+      }
     });
+
     songFeed.appendChild(card);
   });
 
   songFeed.scrollTop = window.innerHeight;
+  enableInfiniteScroll();
 }
 
-// Infinite scroll
-songFeed.addEventListener("scroll", () => {
-  const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
-  if(scrollIndex===0) songFeed.scrollTop = allSongs.length * window.innerHeight;
-  else if(scrollIndex===songElements.length-1) songFeed.scrollTop = window.innerHeight;
-  stopAll();
-  audioPlayers[scrollIndex]?.play();
-});
+function enableInfiniteScroll() {
+  songFeed.addEventListener("scroll", () => {
+    const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
+    if (scrollIndex === 0) songFeed.scrollTop = allSongs.length * window.innerHeight;
+    else if (scrollIndex === songElements.length -1) songFeed.scrollTop = window.innerHeight;
+    stopAll();
+    audioPlayers[scrollIndex]?.play();
+  });
+}
 
-function stopAll() { audioPlayers.forEach(a=>{a.pause(); a.currentTime=0;}); }
+function stopAll() { 
+  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; }); 
+}
 
-// Message Form
+// -----------------
+// Message Popup
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
+  sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
 
-// HugMoji selection
-document.querySelectorAll(".hug-emoji").forEach(btn => {
-  btn.addEventListener("click", () => {
-    selectedEmoji = btn.getAttribute("data-emoji");
-  });
-});
+function sendViaWhatsApp(song) {
+  const message = userMsgInput.value.trim();
+  if (!message) return alert("Please type a message.");
+  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
+  navigator.clipboard.writeText(fullMessage)
+    .then(() => {
+      window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
+      alert("Message copied! Paste it in WhatsApp.");
+      messagePopup.classList.add("hidden");
+      userMsgInput.value = "";
+    });
+}
 
-// Send via WhatsApp
-sendMsgBtn.onclick = () => {
-  const name = recipientName.value.trim();
-  const number = recipientNumber.value.trim();
-  if (!name || !number) return alert("Please enter recipient's name and number.");
-  const songTitle = songTitleEl.textContent;
-  const fullMessage = `🎵 ${songTitle}\nTo: ${name} (${number})\nFeeling: ${selectedEmoji}\n\nSong link: ${window.location.origin}/?song=${songTitle}`;
-  navigator.clipboard.writeText(fullMessage).then(()=>{
-    window.open("https://wa.me/message/WU7FM2NLOXI6P1","_blank");
-    alert("Message copied! Paste it in WhatsApp.");
-    messagePopup.classList.add("hidden");
-    recipientName.value=""; recipientNumber.value=""; selectedEmoji="";
-  });
-};
-
-// Countdown logic
+// -----------------
+// Countdown Logic
 function updateCountdown() {
   const now = new Date();
-  const hour = now.getHours(), min = now.getMinutes(), sec = now.getSeconds();
 
-  if(hour <19){ // pre-hug
-    preHugSection.style.display="flex"; hugHourTopCountdown.classList.add("hidden"); songFeed.style.display="none";
-    let target=new Date(); target.setHours(19,0,0,0);
-    const diff=target-now;
-    const h=String(Math.floor(diff/3600000)).padStart(2,"0");
-    const m=String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
-    const s=String(Math.floor((diff%60000)/1000)).padStart(2,"0");
-    preHugCountdown.textContent=`${h} : ${m} : ${s}`;
+  // PRE-HUG: Before 7 PM
+  if (now.getHours() < 19) {
+    preHugSection.style.display = "flex";
+    hugHourTopCountdown.classList.add("hidden");
+    songFeed.style.display = "none";
+
+    let target = new Date();
+    target.setHours(19, 0, 0, 0);
+    let diff = target - now;
+    if (diff < 0) diff = 0;
+
+    const h = String(Math.floor(diff / 3600000)).padStart(2,"0");
+    const m = String(Math.floor((diff % 3600000)/60000)).padStart(2,"0");
+    const s = String(Math.floor((diff % 60000)/1000)).padStart(2,"0");
+    preHugCountdown.textContent = `${h} : ${m} : ${s}`;
+
+    // Hide intro popup on pre-Hug timer
+    introPopup.classList.add("hidden");
   } 
-  else if(hour>=19 && hour<22){ // hug hour
-    preHugSection.style.display="none"; hugHourTopCountdown.classList.remove("hidden"); songFeed.style.display="block";
-    let target=new Date(); target.setHours(22,0,0,0);
-    const diff=target-now;
-    const h=String(Math.floor(diff/3600000)).padStart(2,"0");
-    const m=String(Math.floor((diff%3600000)/60000)).padStart(2,"0");
-    const s=String(Math.floor((diff%60000)/1000)).padStart(2,"0");
-    hugHourTimer.textContent=`${h}:${m}:${s}`;
-  }
-  else { // post hug
-    preHugSection.style.display="flex"; hugHourTopCountdown.classList.add("hidden"); songFeed.style.display="none";
+  // HUG HOUR: 7 PM – 10 PM
+  else if (now.getHours() >= 19 && now.getHours() < 22) {
+    preHugSection.style.display = "none";
+    hugHourTopCountdown.classList.remove("hidden");
+    songFeed.style.display = "block";
+
+    let target = new Date();
+    target.setHours(22, 0, 0, 0);
+    let diff = target - now;
+
+    const h = String(Math.floor(diff / 3600000)).padStart(2,"0");
+    const m = String(Math.floor((diff % 3600000)/60000)).padStart(2,"0");
+    const s = String(Math.floor((diff % 60000)/1000)).padStart(2,"0");
+    hugHourTimer.textContent = `${h} : ${m} : ${s}`;
+
+    // Show intro popup only at the start of Hug Hour
+    showIntroPopup();
+  } 
+  // POST-HUG: after 10 PM
+  else {
+    preHugSection.style.display = "flex";
+    hugHourTopCountdown.classList.add("hidden");
+    songFeed.style.display = "none";
+    introPopup.classList.add("hidden");
   }
 }
 
-setInterval(updateCountdown,1000);
-updateCountdown();
-loadSongs();
+// -----------------
+// Intro popup during Hug Hour
+function showIntroPopup() {
+  introPopup.classList.remove("hidden");
+  setTimeout(() => {
+    introPopup.classList.add("hidden");
+  }, 10000); // 10 seconds
+}
 
+// -----------------
+// Start Everything
+loadSongs();
+setInterval(updateCountdown, 1000);
+updateCountdown();
