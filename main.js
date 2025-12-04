@@ -64,7 +64,7 @@ function buildFeed() {
     card.classList.add("song-card");
     card.innerHTML = `<img src="${song.coverURL}" class="song-img">
                       <div class="play-overlay">▶</div>
-                      <button class="sendBtn">Copy</button>`;
+                      <button class="sendBtn">Select</button>`;
     
     const audio = new Audio(song.songURL);
     audio.loop = true;
@@ -152,3 +152,4 @@ function updateCountdown() {
 setInterval(updateCountdown,1000);
 updateCountdown();
 loadSongs();
+
