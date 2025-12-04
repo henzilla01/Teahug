@@ -18,7 +18,9 @@ const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const messagePopup = document.getElementById("messagePopup");
 const songTitleEl = document.getElementById("songTitle");
-const userMsgInput = document.getElementById("userMessage");
+const recipientNameInput = document.getElementById("recipientName");
+const recipientNumberInput = document.getElementById("recipientNumber");
+const hugMojiInputs = document.querySelectorAll(".hugmoji-input");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
 
 const preHugSection = document.getElementById("preHugSection");
@@ -30,11 +32,20 @@ let allSongs = [];
 let songElements = [];
 let audioPlayers = [];
 let currentIndex = 0;
+let selectedHugMoji = "❤️";
 
 // -----------------
 // Popups
-setTimeout(() => introPopup.classList.add("hidden"), 5000);
 window.closeMessageForm = () => messagePopup.classList.add("hidden");
+
+// HugMoji selection
+hugMojiInputs.forEach(btn => {
+  btn.addEventListener("click", () => {
+    selectedHugMoji = btn.dataset.value;
+    hugMojiInputs.forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+  });
+});
 
 // -----------------
 // Load Songs
@@ -50,7 +61,7 @@ function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
   audioPlayers = [];
-  
+
   const loopSongs = [allSongs[allSongs.length -1], ...allSongs, allSongs[0]];
 
   loopSongs.forEach((song, index) => {
@@ -58,7 +69,7 @@ function buildFeed() {
     card.classList.add("song-card");
     card.innerHTML = `<img src="${song.coverURL}" class="song-img">
                       <div class="play-overlay">▶</div>
-                      <button class="sendBtn">Send</button>`;
+                      <button class="sendBtn">Copy</button>`;
     
     const audio = new Audio(song.songURL);
     audio.loop = true;
@@ -105,15 +116,19 @@ function openMessageForm(song) {
 }
 
 function sendViaWhatsApp(song) {
-  const message = userMsgInput.value.trim();
-  if (!message) return alert("Please type a message.");
-  const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
-  navigator.clipboard.writeText(fullMessage)
+  const name = recipientNameInput.value.trim();
+  const number = recipientNumberInput.value.trim();
+  if (!name || !number) return alert("Please enter recipient name and number.");
+
+  const message = `🎵 ${song.title}\n\nTo: ${name}\nNumber: ${number}\nHugMoji: ${selectedHugMoji}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
+  
+  navigator.clipboard.writeText(message)
     .then(() => {
       window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
-      alert("Message copied! Paste it in WhatsApp.");
+      alert("Message copied! Paste it in WhatsApp to send.");
       messagePopup.classList.add("hidden");
-      userMsgInput.value = "";
+      recipientNameInput.value = "";
+      recipientNumberInput.value = "";
     });
 }
 
@@ -129,39 +144,38 @@ function updateCountdown() {
   if (hour < 19) {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
+    songFeed.style.display = "none";
+    introPopup.classList.add("hidden");
 
     let target = new Date();
     target.setHours(19,0,0,0);
     const diff = target - now;
-
     const h = String(Math.floor(diff / 3600000)).padStart(2,"0");
     const m = String(Math.floor((diff % 3600000)/60000)).padStart(2,"0");
     const s = String(Math.floor((diff % 60000)/1000)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
-
-    songFeed.style.display = "none";
-    introPopup.classList.add("hidden"); // Hide popups
   }
   // HUG HOUR: 7PM - 10PM
   else if (hour >= 19 && hour < 22) {
     preHugSection.style.display = "none";
     hugHourTopCountdown.classList.remove("hidden");
     songFeed.style.display = "block";
+    introPopup.classList.remove("hidden");
 
     let target = new Date();
     target.setHours(22,0,0,0);
     const diff = target - now;
-
     const h = String(Math.floor(diff / 3600000)).padStart(2,"0");
     const m = String(Math.floor((diff % 3600000)/60000)).padStart(2,"0");
     const s = String(Math.floor((diff % 60000)/1000)).padStart(2,"0");
     hugHourTimer.textContent = `${h}:${m}:${s}`;
   }
-  // POST HUG: after 10 PM
+  // POST-HUG: after 10 PM
   else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
+    introPopup.classList.add("hidden");
   }
 }
 
