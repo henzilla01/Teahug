@@ -191,40 +191,6 @@ function sendViaWhatsApp(song) {
 /* ===============================
    HUG HOUR COUNTDOWN
    =============================== */
-function updateCountdown() {
-  const now = new Date();
-  const hour = now.getHours();
-
-  const wrapper = document.getElementById("countdownWrapper");
-
-  // Between 7 PM (19) and 10 PM (22) → hide countdown
-  if (hour >= 19 && hour < 22) {
-    wrapper.style.display = "none";
-    return;
-  }
-
-  // Otherwise → show it
-  wrapper.style.display = "block";
-
-  let target = new Date();
-  target.setHours(19, 0, 0, 0); // 7 PM start time
-
-  // If it's already past 10 PM, countdown to next day's 7 PM
-  if (hour >= 22) {
-    target.setDate(target.getDate() + 1);
-  }
-
-  let diff = target - now;
-
-  let h = String(Math.floor(diff / 3600000)).padStart(2, "0");
-  let m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-  let s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-
-  document.getElementById("countdownBig").textContent = `${h} : ${m} : ${s}`;
-}
-
-// Update every second
-setInterval(updateCountdown, 1000);
 /* ===============================
    START EVERYTHING
    =============================== */
@@ -279,5 +245,6 @@ setInterval(updateHugHourCountdown, 1000);
 
 // Run immediately on page load
 updateHugHourCountdown();
+
 
 
