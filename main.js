@@ -1,11 +1,7 @@
-/* ===============================
-   TEAHUG MAIN JAVASCRIPT
-   =============================== */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔹 Firebase config
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -20,11 +16,9 @@ const db = getFirestore(app);
 
 // DOM elements
 const songFeed = document.getElementById("songFeed");
-const introPopup = document.getElementById("introPopup");
 const messagePopup = document.getElementById("messagePopup");
-const countdownWrapper = document.getElementById("countdownWrapper");
+const countdownSection = document.getElementById("countdown-section");
 const countdownBig = document.getElementById("countdownBig");
-const countdownText = document.getElementById("countdownText");
 const songTitleEl = document.getElementById("songTitle");
 const userMsgInput = document.getElementById("userMessage");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
@@ -33,67 +27,38 @@ let allSongs = [];
 let songElements = [];
 let audioPlayers = [];
 
-/* ===============================
-   HELPER FUNCTIONS
-   =============================== */
-function stopAll() {
-  audioPlayers.forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
-}
-
-/* ===============================
-   POPUP HANDLING
-   =============================== */
-function showIntroPopup() {
-  const now = new Date();
-  const hour = now.getHours();
-
-  // Show intro popup only if feed is active (7–10 PM)
-  if (hour >= 19 && hour < 22) {
-    introPopup.classList.remove("hidden");
-    setTimeout(() => introPopup.classList.add("hidden"), 5000);
-  } else {
-    introPopup.classList.add("hidden");
-  }
-}
-
+// Close message popup
 window.closeMessageForm = function () {
   messagePopup.classList.add("hidden");
 };
 
-/* ===============================
-   LOAD SONGS
-   =============================== */
+// Load songs
 async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   buildFeed();
 
-  // Check for song URL parameter
+  // Wait for DOM
+  await new Promise(resolve => setTimeout(resolve, 300));
+
+  // Check if URL has ?song=ID
   const params = new URLSearchParams(window.location.search);
   const songId = params.get("song");
 
   if (songId) {
     const index = allSongs.findIndex(s => s.id === songId);
     if (index !== -1) {
-      const card = songElements[index + 1]; // +1 because of cloned first card
-      if (card) card.scrollIntoView({ behavior: "auto" });
+      const card = songElements[index + 1]; // +1 for cloned first card
+      card.scrollIntoView({ behavior: "auto" });
       playSong(index + 1);
     }
   } else {
     playSong(0);
   }
-
-  // Show intro popup if applicable
-  showIntroPopup();
 }
 
-/* ===============================
-   BUILD FEED
-   =============================== */
+// Build feed
 function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
@@ -117,13 +82,11 @@ function buildFeed() {
     audioPlayers.push(audio);
     songElements.push(card);
 
-    // Send button
     card.querySelector(".sendBtn").onclick = (e) => {
       e.stopPropagation();
       openMessageForm(song);
     };
 
-    // Tap to play/pause
     const playOverlay = card.querySelector(".play-overlay");
     card.addEventListener("click", () => {
       if (audio.paused) {
@@ -139,6 +102,7 @@ function buildFeed() {
   });
 
   songFeed.scrollTop = window.innerHeight;
+
   enableInfiniteScroll();
 }
 
@@ -157,26 +121,22 @@ function enableInfiniteScroll() {
   });
 }
 
-function playSong(index) {
-  stopAll();
-  audioPlayers[index]?.play();
+function stopAll() {
+  audioPlayers.forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
 }
 
-/* ===============================
-   MESSAGE POPUP
-   =============================== */
+// Open message form
 function openMessageForm(song) {
-  const now = new Date();
-  const hour = now.getHours();
-
-  // Only open message if feed is active
-  if (!(hour >= 19 && hour < 22)) return;
-
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
+
   sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
 
+// Send via WhatsApp
 function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
@@ -196,45 +156,34 @@ function sendViaWhatsApp(song) {
     });
 }
 
-/* ===============================
-   HUG HOUR COUNTDOWN
-   =============================== */
-function updateCountdown() {
+// Hug Hour Countdown
+function updateHugHourCountdown() {
   const now = new Date();
-  const hour = now.getHours();
 
-  // Hide countdown during active feed
-  if (hour >= 19 && hour < 22) {
-    countdownWrapper.style.display = "none";
+  const hugStart = new Date();
+  hugStart.setHours(19, 0, 0, 0); // 7 PM
+  const hugEnd = new Date();
+  hugEnd.setHours(22, 0, 0, 0); // 10 PM
+
+  if (now >= hugStart && now < hugEnd) {
+    countdownSection.classList.add("hidden");
     return;
-  } else {
-    countdownWrapper.style.display = "flex";
   }
 
-  let target = new Date();
-  target.setHours(19, 0, 0, 0);
-  if (now >= target) target.setDate(target.getDate() + 1);
+  countdownSection.classList.remove("hidden");
 
-  const diff = target - now;
-  const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
-  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+  if (now >= hugEnd) hugStart.setDate(hugStart.getDate() + 1);
 
-  countdownBig.textContent = `${h} : ${m} : ${s}`;
-   // Hide popups when countdown is active
-if (now < hugStart || now >= hugEnd) {
-    // Countdown visible → hide popups
-    messagePopup.classList.add("hidden");
-    introPopup.classList.add("hidden");
-}
+  const diff = hugStart - now;
+  const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
+  const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
+  const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
+
+  countdownBig.textContent = `${hours} : ${minutes} : ${seconds}`;
 }
 
-// Update every second
-setInterval(updateCountdown, 1000);
+setInterval(updateHugHourCountdown, 1000);
+updateHugHourCountdown();
 
-/* ===============================
-   START EVERYTHING
-   =============================== */
+// Start
 loadSongs();
-updateCountdown();
-
