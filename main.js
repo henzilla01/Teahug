@@ -221,6 +221,12 @@ function updateCountdown() {
   const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
 
   countdownBig.textContent = `${h} : ${m} : ${s}`;
+   // Hide popups when countdown is active
+if (now < hugStart || now >= hugEnd) {
+    // Countdown visible → hide popups
+    messagePopup.classList.add("hidden");
+    introPopup.classList.add("hidden");
+}
 }
 
 // Update every second
@@ -231,3 +237,4 @@ setInterval(updateCountdown, 1000);
    =============================== */
 loadSongs();
 updateCountdown();
+
