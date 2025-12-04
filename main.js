@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// -----------------
 // Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
@@ -11,15 +10,11 @@ const firebaseConfig = {
   messagingSenderId: "540501854830",
   appId: "1:540501854830:web:7249bb97b50582fe97747f"
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// -----------------
 // DOM Elements
-const preHugSection = document.getElementById("preHugSection");
-const preHugCountdown = document.getElementById("preHugCountdown");
-const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
-const hugHourTimer = document.getElementById("hugHourTimer");
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
 const messagePopup = document.getElementById("messagePopup");
@@ -27,33 +22,29 @@ const songTitleEl = document.getElementById("songTitle");
 const recipientNameInput = document.getElementById("recipientName");
 const recipientNumberInput = document.getElementById("recipientNumber");
 const sendMsgBtn = document.getElementById("sendMsgBtn");
-const hugEmojiButtons = document.querySelectorAll(".hug-emoji");
+const hugEmojis = document.querySelectorAll(".hug-emoji");
+
+const preHugSection = document.getElementById("preHugSection");
+const preHugCountdown = document.getElementById("preHugCountdown");
+const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
+const hugHourTimer = document.getElementById("hugHourTimer");
 
 let allSongs = [];
 let songElements = [];
 let audioPlayers = [];
 let currentIndex = 0;
-let selectedEmoji = "❤️"; // default
+let selectedEmoji = "";
 
 // -----------------
-// Intro popup auto-close (during Hug Hour only)
+// Popups
 function showIntroPopup() {
   introPopup.classList.remove("hidden");
-  setTimeout(() => introPopup.classList.add("hidden"), 10000); // hide after 10s
+  setTimeout(() => introPopup.classList.add("hidden"), 10000); // auto close after 10s
 }
+window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
 // -----------------
-// HugMoji selection
-hugEmojiButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    selectedEmoji = btn.dataset.emoji;
-    hugEmojiButtons.forEach(b => b.classList.remove("selected"));
-    btn.classList.add("selected");
-  });
-});
-
-// -----------------
-// Load songs from Firebase
+// Load Songs
 async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -61,7 +52,7 @@ async function loadSongs() {
 }
 
 // -----------------
-// Build song feed
+// Build Feed
 function buildFeed() {
   songFeed.innerHTML = "";
   songElements = [];
@@ -72,38 +63,36 @@ function buildFeed() {
   loopSongs.forEach((song, index) => {
     const card = document.createElement("div");
     card.classList.add("song-card");
-    card.innerHTML = `
-      <img src="${song.coverURL}" class="song-img">
-      <div class="play-overlay">▶</div>
-      <button class="sendBtn">Select</button>
-    `;
-
+    card.innerHTML = `<img src="${song.coverURL}" class="song-img">
+                      <div class="play-overlay">▶</div>
+                      <button class="sendBtn">Select</button>`;
+    
     const audio = new Audio(song.songURL);
     audio.loop = true;
     audioPlayers.push(audio);
     songElements.push(card);
 
-    // Send button opens message form
+    // Send button
     card.querySelector(".sendBtn").onclick = e => {
       e.stopPropagation();
       openMessageForm(song);
     };
 
-    // Tap to play/pause
+    // Play overlay
     card.addEventListener("click", () => {
-      if (audio.paused) {
-        audio.play();
-        card.querySelector(".play-overlay").style.display = "none";
-      } else {
-        audio.pause();
-        card.querySelector(".play-overlay").style.display = "block";
+      if (audio.paused) { 
+        stopAll();
+        audio.play(); 
+        card.querySelector(".play-overlay").style.display = "none"; 
+      } else { 
+        audio.pause(); 
+        card.querySelector(".play-overlay").style.display = "block"; 
       }
     });
 
     songFeed.appendChild(card);
   });
 
-  // Start at first real song
   songFeed.scrollTop = window.innerHeight;
   enableInfiniteScroll();
 }
@@ -112,36 +101,41 @@ function enableInfiniteScroll() {
   songFeed.addEventListener("scroll", () => {
     const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
     if (scrollIndex === 0) songFeed.scrollTop = allSongs.length * window.innerHeight;
-    else if (scrollIndex === songElements.length - 1) songFeed.scrollTop = window.innerHeight;
+    else if (scrollIndex === songElements.length -1) songFeed.scrollTop = window.innerHeight;
     stopAll();
     audioPlayers[scrollIndex]?.play();
   });
 }
 
-function stopAll() {
-  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
+function stopAll() { 
+  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; }); 
 }
 
 // -----------------
-// Message popup
+// Message Form
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
 
+  hugEmojis.forEach(btn => {
+    btn.onclick = () => {
+      hugEmojis.forEach(e => e.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedEmoji = btn.dataset.emoji;
+    };
+  });
+
   sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
 
-window.closeMessageForm = () => messagePopup.classList.add("hidden");
-
 function sendViaWhatsApp(song) {
-  const recipientName = recipientNameInput.value.trim();
-  const recipientNumber = recipientNumberInput.value.trim();
-  if (!recipientName || !recipientNumber) {
-    return alert("Please enter both recipient name and phone number.");
-  }
+  const name = recipientNameInput.value.trim();
+  const number = recipientNumberInput.value.trim();
+  if (!name || !number) return alert("Please enter recipient name and number.");
+  if (!selectedEmoji) return alert("Please select a HugMoji.");
 
-  const fullMessage = `🎵 ${song.title}\nTo: ${recipientName} (${recipientNumber})\nFeeling: ${selectedEmoji}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
-  
+  const fullMessage = `🎵 ${song.title}\nFrom: ${name}\nPhone: ${number}\nFeeling: ${selectedEmoji}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
+
   navigator.clipboard.writeText(fullMessage)
     .then(() => {
       window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
@@ -149,23 +143,23 @@ function sendViaWhatsApp(song) {
       messagePopup.classList.add("hidden");
       recipientNameInput.value = "";
       recipientNumberInput.value = "";
+      selectedEmoji = "";
+      hugEmojis.forEach(e => e.classList.remove("selected"));
     });
 }
 
 // -----------------
-// Countdown logic
+// Countdown Logic
 function updateCountdown() {
   const now = new Date();
   const hour = now.getHours();
-  const min = now.getMinutes();
-  const sec = now.getSeconds();
 
-  // Pre-Hug: before 7 PM
+  // PRE-HUG: before 7 PM
   if (hour < 19) {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-    introPopup.classList.add("hidden"); // no popup before hug
+    introPopup.classList.add("hidden");
 
     let target = new Date();
     target.setHours(19,0,0,0);
@@ -177,8 +171,7 @@ function updateCountdown() {
 
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
   }
-
-  // Hug Hour: 7 PM – 10 PM
+  // HUG HOUR: 7 PM - 10 PM
   else if (hour >= 19 && hour < 22) {
     preHugSection.style.display = "none";
     hugHourTopCountdown.classList.remove("hidden");
@@ -194,20 +187,30 @@ function updateCountdown() {
 
     hugHourTimer.textContent = `${h} : ${m} : ${s}`;
 
-    showIntroPopup(); // popup appears only once per load
+    // Show intro popup once at start of Hug Hour
+    if (h === "03" && m === "00" && s === "00") showIntroPopup();
   }
-
-  // After 10 PM
+  // POST-HUG: after 10 PM
   else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-    introPopup.classList.add("hidden");
+
+    let target = new Date();
+    target.setDate(target.getDate() +1);
+    target.setHours(19,0,0,0);
+    const diff = target - now;
+
+    const h = String(Math.floor(diff / (1000*60*60))).padStart(2,"0");
+    const m = String(Math.floor((diff / (1000*60)) % 60)).padStart(2,"0");
+    const s = String(Math.floor((diff / 1000) % 60)).padStart(2,"0");
+
+    preHugCountdown.textContent = `${h} : ${m} : ${s}`;
   }
 }
 
 // -----------------
-// Start everything
+// Start Everything
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
