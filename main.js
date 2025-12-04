@@ -231,5 +231,53 @@ setInterval(updateCountdown, 1000);
 loadSongs();
 updateCountdown();
 
+// ===============================
+// HUG HOUR COUNTDOWN CONTROLLER
+// ===============================
+function updateHugHourCountdown() {
+    const now = new Date();
+
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentSeconds = now.getSeconds();
+
+    const countdownContainer = document.getElementById("countdown-section");
+    const countdownText = document.getElementById("countdown");
+
+    // HUG HOURS are 19:00 → 22:00 (7pm–10pm)
+    const hugStart = new Date();
+    hugStart.setHours(19, 0, 0); // 7:00 PM
+
+    const hugEnd = new Date();
+    hugEnd.setHours(22, 0, 0); // 10:00 PM
+
+    // If it's currently between 7pm and 10pm → hide the countdown
+    if (now >= hugStart && now < hugEnd) {
+        if (countdownContainer) countdownContainer.style.display = "none";
+        return;
+    }
+
+    // Outside Hug Hours → SHOW countdown full-screen
+    if (countdownContainer) countdownContainer.style.display = "flex";
+
+    // Determine the next day's 7pm if time has passed already
+    if (now > hugStart) {
+        hugStart.setDate(hugStart.getDate() + 1);
+    }
+
+    const diff = hugStart - now;
+
+    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+    const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, "0");
+    const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
+
+    countdownText.textContent = `${hours} : ${minutes} : ${seconds}`;
+}
+
+// Update every second
+setInterval(updateHugHourCountdown, 1000);
+
+// Run immediately on page load
+updateHugHourCountdown();
 
 
