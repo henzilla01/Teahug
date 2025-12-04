@@ -31,15 +31,36 @@
   <!-- Intro Popup -->
   <div id="introPopup" class="popup intro-popup hidden">
     <h2>HugsHour is LIVE! 🎉</h2>
-    <p>Your 3-HOUR DAILY WINDOW for CONNECTIONS not MESSAGES</p>
+    <p>
+      *Your 3-HOUR DAILY WINDOW for CONNECTIONS not MESSAGES*<br><br>
+      - *Set the mood for your hug in 3 simple steps*:<br>
+      1. Pick your vibe (15-second song) Tap on "COPY LINK"<br>
+      2. Enter Recipient details<br>
+      3. Send the hug (via WhatsApp)<br><br>
+      No SIGNUP, No MESSAGES, Just HUGS!
+    </p>
   </div>
 
   <!-- Message Popup -->
   <div id="messagePopup" class="popup message-popup hidden">
     <h3 id="songTitle">Song Title</h3>
-    <p>Type in the recipient's name and phone number.</p>
-    <input type="text" id="userMessage" placeholder="Your message here...">
-    <button id="sendMsgBtn">Send</button>
+    <p>1. Recipient Details<br>
+       &middot; Enter your friend's name.<br>
+       &middot; Enter their phone number.
+    </p>
+    <input type="text" id="recipientName" placeholder="Recipient Name">
+    <input type="text" id="recipientNumber" placeholder="Recipient Phone Number">
+
+    <p>2. Choose a Feeling HugMoji (LOVE or POPCORN?)<br>
+       &middot; Tap for ❤️ (Love)<br>
+       &middot; Tap for 🍿 (Popcorn)<br>
+       Tip: Use ❤️ for romance, 🍿 for friendly vibes.
+    </p>
+    <button class="hugmoji-input" data-value="❤️">❤️</button>
+    <button class="hugmoji-input" data-value="🍿">🍿</button>
+
+    <p>&middot; Click "Copy" to copy link and send via WhatsApp.</p>
+    <button id="sendMsgBtn">Copy</button>
     <button onclick="closeMessageForm()">Close</button>
   </div>
 
