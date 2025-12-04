@@ -115,44 +115,55 @@ function sendViaWhatsApp(song) {
 // ======================
 // Hug Hour Countdown
 // ======================
-function hugHourCountdown() {
+// ======================
+// Hug Hour Timer Controller
+// ======================
+function updateTimers() {
     const now = new Date();
-    const hugStart = new Date(); hugStart.setHours(19,0,0,0);
-    const hugEnd = new Date(); hugEnd.setHours(22,0,0,0);
+
+    const hugStart = new Date();
+    hugStart.setHours(19, 0, 0, 0); // 7 PM
+    const hugEnd = new Date();
+    hugEnd.setHours(22, 0, 0, 0);   // 10 PM
 
     const preHugSection = document.getElementById("preHugSection");
     const preHugCountdown = document.getElementById("preHugCountdown");
     const hugTop = document.getElementById("hugHourTopCountdown");
     const hugTopTimer = document.getElementById("hugCountdownTop");
 
-    if(now >= hugStart && now < hugEnd) {
-        // During Hug Hour → show top timer
+    if (now >= hugStart && now < hugEnd) {
+        // During Hug Hour → show top timer only
         preHugSection.classList.add("hidden");
         hugTop.classList.remove("hidden");
 
         const diff = hugEnd - now;
-        const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
-        const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-        const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
+        const h = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+        const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, "0");
+        const s = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
         hugTopTimer.textContent = `${h} : ${m} : ${s}`;
     } else {
-        // Before Hug Hour → full screen timer
+        // Before Hug Hour → show fullscreen timer only
         hugTop.classList.add("hidden");
         preHugSection.classList.remove("hidden");
 
-        if(now > hugEnd) hugStart.setDate(hugStart.getDate()+1);
+        // If past today's Hug End, countdown to next day
+        if (now >= hugEnd) hugStart.setDate(hugStart.getDate() + 1);
 
         const diff = hugStart - now;
-        const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
-        const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-        const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
+        const h = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, "0");
+        const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, "0");
+        const s = String(Math.floor((diff / 1000) % 60)).padStart(2, "0");
         preHugCountdown.textContent = `${h} : ${m} : ${s}`;
     }
 }
 
+// Update every second
+setInterval(updateTimers, 1000);
+updateTimers(); // run immediately
 // Update every second
 setInterval(hugHourCountdown,1000);
 hugHourCountdown();
 
 // Start everything
 loadSongs();
+
