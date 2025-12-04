@@ -2,41 +2,40 @@
    TEAHUG STYLE.CSS
    =============================== */
 
-/* Reset and basic settings */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: Arial, sans-serif;
-  overflow: hidden; /* prevent default scrolling */
-  background-color: #000; /* black background like TikTok */
+  overflow: hidden;
+  background-color: #000;
   color: #fff;
   height: 100vh;
 }
 
-/* Song feed container */
+/* Song feed */
 .song-feed {
   height: 100vh;
   scroll-snap-type: y mandatory;
   overflow-y: scroll;
+  display: none; /* hidden until Hug Hour */
+  position: relative;
+  z-index: 5;
 }
 
-/* Each song card */
+/* Song card */
 .song-card {
   position: relative;
   width: 100%;
-  height: 100vh; /* full screen */
+  height: 100vh;
   scroll-snap-align: start;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-bottom: 2px solid #333; /* TikTok border effect */
+  border-bottom: 2px solid #333;
 }
 
-/* Cover image */
+/* Song image */
 .song-card img.song-img {
   width: 100%;
   height: 100%;
@@ -51,7 +50,7 @@ body {
   cursor: pointer;
 }
 
-/* Send button at bottom center */
+/* Send button */
 .sendBtn {
   position: absolute;
   bottom: 30px;
@@ -68,10 +67,7 @@ body {
   opacity: 0.9;
   transition: opacity 0.2s;
 }
-
-.sendBtn:hover {
-  opacity: 1;
-}
+.sendBtn:hover { opacity: 1; }
 
 /* Popups */
 .popup {
@@ -85,14 +81,11 @@ body {
   max-width: 90%;
   max-height: 80%;
   text-align: center;
-  z-index: 10000;
+  z-index: 1000;
   color: #fff;
   animation: fadeIn 0.5s ease;
 }
-
-.popup.hidden {
-  display: none;
-}
+.popup.hidden { display: none; }
 
 /* Animations */
 @keyframes fadeIn {
@@ -100,51 +93,25 @@ body {
   to {opacity: 1; transform: translate(-50%, -50%);}
 }
 
-/* Countdown full-screen overlay */
+/* Countdown full screen */
 #countdown-section {
-  height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
   width: 100%;
+  height: 100vh;
+  background: #000;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2000;
   flex-direction: column;
-  transition: opacity 0.5s ease;
+  z-index: 10;
 }
 
-.countdown-label {
-  font-size: 16px;
-  opacity: 0.7;
-  margin-bottom: 10px;
-}
+#countdown-label { font-size: 14px; opacity: 0.7; margin-bottom: 10px; }
+#countdownBig { font-size: 80px; font-weight: bold; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.8); animation: pulse 2s infinite ease-in-out; letter-spacing: 3px; }
+.countdown-sub { font-size: 16px; margin-top: 10px; opacity: 0.9; }
+.countdown-tagline { margin-top: 6px; font-size: 14px; opacity: 0.8; font-style: italic; }
 
-#countdownBig {
-  font-size: 80px;
-  font-weight: bold;
-  letter-spacing: 3px;
-  color: #fff;
-  text-shadow: 0 0 20px rgba(255,255,255,0.8);
-  animation: pulse 2s infinite ease-in-out;
-}
-
-.countdown-sub {
-  font-size: 18px;
-  margin-top: 10px;
-  opacity: 0.9;
-}
-
-.countdown-tagline {
-  margin-top: 6px;
-  font-size: 14px;
-  opacity: 0.8;
-  font-style: italic;
-}
-
-/* Smooth glowing pulse */
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.9; }
   50% { transform: scale(1.12); opacity: 1; }
