@@ -8,10 +8,10 @@
 </head>
 <body>
 
-  <!-- FULLSCREEN PRE-HUG TIMER -->
+  <!-- PRE-HUG FULLSCREEN COUNTDOWN -->
   <div id="preHugSection">
     <div id="preHugCountdownContainer">
-      <div class="countdown-label">HugsHour will be LIVE in</div>
+      <div class="countdown-label">Hugshour will be LIVE in</div>
       <div id="preHugCountdown">00 : 00 : 00</div>
       <div class="countdown-sub">Daily, 7 PM – 10 PM</div>
       <div class="countdown-tagline">
@@ -20,46 +20,38 @@
     </div>
   </div>
 
-  <!-- TOP TIMER DURING HUG HOUR -->
+  <!-- HUG HOUR TOP COUNTDOWN -->
   <div id="hugHourTopCountdown" class="hidden">
-    <div class="top-countdown">Hug Hour Ends in: <span id="hugHourTimer">00:00:00</span></div>
+    Hug Hour Ends in: <span id="hugHourTimer">00:00:00</span>
   </div>
 
-  <!-- Song Feed -->
+  <!-- SONG FEED -->
   <div id="songFeed" class="song-feed"></div>
 
-  <!-- Intro Popup -->
+  <!-- INTRO POPUP -->
   <div id="introPopup" class="popup intro-popup hidden">
     <h2>HugsHour is LIVE! 🎉</h2>
     <p>
       *Your 3-HOUR DAILY WINDOW for CONNECTIONS not MESSAGES*<br><br>
       *Set the mood for your hug in 3 simple steps*:<br>
       1. Pick your vibe (15-second song) Tap on "COPY LINK"<br>
-      2. Enter Recipient details<br>
+      2. Enter Recipient details <br>
       3. Send the hug (via WhatsApp)<br><br>
       No SIGNUP, No MESSAGES, Just HUGS!
     </p>
   </div>
 
-  <!-- Message Popup -->
+  <!-- MESSAGE POPUP -->
   <div id="messagePopup" class="popup message-popup hidden">
     <h3 id="songTitle">Song Title</h3>
-
-    <!-- 1. Recipient Details -->
-    <p class="form-section-title">1. Recipient Details</p>
-    <input type="text" id="recipientName" placeholder="Friend's Name">
-    <input type="text" id="recipientPhone" placeholder="Phone Number">
-
-    <!-- 2. HugMoji Selection -->
-    <p class="form-section-title">2. (LOVE or POPCORN?)</p>
-    <div id="hugMojiContainer">
-      <button class="hugMojiBtn" data-emoji="❤️">❤️</button>
-      <button class="hugMojiBtn" data-emoji="🍿">🍿</button>
+    <p>Recipient Details:</p>
+    <input type="text" id="recipientName" placeholder="Recipient Name">
+    <input type="text" id="recipientNumber" placeholder="Recipient Phone Number">
+    <p>Choose a Feeling HugMoji (LOVE or POPCORN?)</p>
+    <div class="hugmoji-container">
+      <button class="hug-emoji" data-emoji="❤️">❤️</button>
+      <button class="hug-emoji" data-emoji="🍿">🍿</button>
     </div>
-    <p class="tip">Tip: Use ❤️ for romance, 🍿 for friendly vibes.</p>
-
-    <textarea id="userMessage" placeholder="Your message here..."></textarea>
-
     <button id="sendMsgBtn">Copy</button>
     <button onclick="closeMessageForm()">Close</button>
   </div>
