@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Firebase config
+// 🔹 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -16,6 +16,7 @@ const db = getFirestore(app);
 
 // DOM elements
 const songFeed = document.getElementById("songFeed");
+const introPopup = document.getElementById("introPopup");
 const messagePopup = document.getElementById("messagePopup");
 const countdownSection = document.getElementById("countdown-section");
 const countdownBig = document.getElementById("countdownBig");
@@ -27,29 +28,29 @@ let allSongs = [];
 let songElements = [];
 let audioPlayers = [];
 
+// Intro popup auto-close
+setTimeout(() => introPopup.classList.add("hidden"), 5000);
+
 // Close message popup
 window.closeMessageForm = function () {
   messagePopup.classList.add("hidden");
 };
 
-// Load songs
+// Load songs from Firestore
 async function loadSongs() {
   const snapshot = await getDocs(collection(db, "songs"));
   allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
   buildFeed();
-
-  // Wait for DOM
   await new Promise(resolve => setTimeout(resolve, 300));
 
-  // Check if URL has ?song=ID
+  // Check URL for specific song
   const params = new URLSearchParams(window.location.search);
   const songId = params.get("song");
 
   if (songId) {
     const index = allSongs.findIndex(s => s.id === songId);
     if (index !== -1) {
-      const card = songElements[index + 1]; // +1 for cloned first card
+      const card = songElements[index + 1]; // +1 for cloned card
       card.scrollIntoView({ behavior: "auto" });
       playSong(index + 1);
     }
@@ -78,15 +79,16 @@ function buildFeed() {
 
     const audio = new Audio(song.songURL);
     audio.loop = true;
-
     audioPlayers.push(audio);
     songElements.push(card);
 
+    // Send button
     card.querySelector(".sendBtn").onclick = (e) => {
       e.stopPropagation();
       openMessageForm(song);
     };
 
+    // Tap to play/pause
     const playOverlay = card.querySelector(".play-overlay");
     card.addEventListener("click", () => {
       if (audio.paused) {
@@ -102,14 +104,13 @@ function buildFeed() {
   });
 
   songFeed.scrollTop = window.innerHeight;
-
   enableInfiniteScroll();
 }
 
+// Infinite scroll
 function enableInfiniteScroll() {
   songFeed.addEventListener("scroll", () => {
     const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
-
     if (scrollIndex === 0) {
       songFeed.scrollTop = allSongs.length * window.innerHeight;
     } else if (scrollIndex === songElements.length - 1) {
@@ -122,13 +123,10 @@ function enableInfiniteScroll() {
 }
 
 function stopAll() {
-  audioPlayers.forEach(a => {
-    a.pause();
-    a.currentTime = 0;
-  });
+  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
 }
 
-// Open message form
+// Open message popup
 function openMessageForm(song) {
   songTitleEl.textContent = song.title;
   messagePopup.classList.remove("hidden");
@@ -136,54 +134,57 @@ function openMessageForm(song) {
   sendMsgBtn.onclick = () => sendViaWhatsApp(song);
 }
 
-// Send via WhatsApp
+// Send message via WhatsApp
 function sendViaWhatsApp(song) {
   const message = userMsgInput.value.trim();
   if (!message) return alert("Please type a message.");
 
   const fullMessage = `🎵 ${song.title}\n\n${message}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
-
-  navigator.clipboard.writeText(fullMessage)
-    .then(() => {
-      window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
-      alert("Message copied! Paste it in WhatsApp to send.");
-      messagePopup.classList.add("hidden");
-      userMsgInput.value = "";
-    })
-    .catch(err => {
-      alert("Failed to copy message. Please try again.");
-      console.error(err);
-    });
+  
+  navigator.clipboard.writeText(fullMessage).then(() => {
+    window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
+    alert("Message copied! Paste it in WhatsApp to send.");
+    messagePopup.classList.add("hidden");
+    userMsgInput.value = "";
+  }).catch(err => {
+    alert("Failed to copy message. Please try again.");
+    console.error(err);
+  });
 }
 
-// Hug Hour Countdown
-function updateHugHourCountdown() {
+// Play song at index
+function playSong(index) {
+  stopAll();
+  audioPlayers[index]?.play();
+}
+
+// Hug Hour countdown
+function updateCountdown() {
   const now = new Date();
+  let countdownStart = new Date();
+  countdownStart.setHours(19, 0, 0, 0); // 7 PM
+  let countdownEnd = new Date();
+  countdownEnd.setHours(22, 0, 0, 0); // 10 PM
 
-  const hugStart = new Date();
-  hugStart.setHours(19, 0, 0, 0); // 7 PM
-  const hugEnd = new Date();
-  hugEnd.setHours(22, 0, 0, 0); // 10 PM
-
-  if (now >= hugStart && now < hugEnd) {
-    countdownSection.classList.add("hidden");
+  if (now >= countdownStart && now < countdownEnd) {
+    countdownSection.style.display = "none"; // Hide during Hug Hour
     return;
+  } else {
+    countdownSection.style.display = "flex";
   }
 
-  countdownSection.classList.remove("hidden");
+  if (now > countdownEnd) countdownStart.setDate(countdownStart.getDate() + 1);
 
-  if (now >= hugEnd) hugStart.setDate(hugStart.getDate() + 1);
+  const diff = countdownStart - now;
+  const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
+  const m = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
+  const s = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
 
-  const diff = hugStart - now;
-  const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
-  const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-  const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-
-  countdownBig.textContent = `${hours} : ${minutes} : ${seconds}`;
+  countdownBig.textContent = `${h} : ${m} : ${s}`;
 }
 
-setInterval(updateHugHourCountdown, 1000);
-updateHugHourCountdown();
+setInterval(updateCountdown, 1000);
 
-// Start
+// Initialize
 loadSongs();
+updateCountdown();
