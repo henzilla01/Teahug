@@ -51,7 +51,69 @@ Discover the perfect song for your hug 💫</p>
   </div>
 
   <script type="module" src="main.js"></script>
+  <!-- Mood Picker Modal -->
+<div id="moodModal" class="modal hidden">
+  <div class="modal-card neon">
+    <h2 class="modal-title">Love or Popcorn?</h2>
+
+    <div class="mood-options">
+      <button class="mood-btn love" onclick="selectMood('love')">
+        ❤️
+        <span>Team Love</span>
+      </button>
+
+      <button class="mood-btn popcorn" onclick="selectMood('popcorn')">
+        🍿
+        <span>Team Popcorn</span>
+      </button>
+    </div>
+
+    <p class="modal-footer-text">Listen with your Heart</p>
+  </div>
+</div>
+
+<!-- Message Form Modal -->
+<div id="formModal" class="modal hidden">
+  <div class="modal-card neon">
+    <h2 id="formTitle"></h2>
+
+    <p class="song-label">
+      🎵 Song: <span id="selectedSongTitle"></span>
+    </p>
+
+    <input
+      type="text"
+      id="userName"
+      placeholder="Name"
+      required
+    />
+
+    <input
+      type="tel"
+      id="userWhatsapp"
+      placeholder="WhatsApp Contact"
+      required
+    />
+
+    <p class="helper-text">
+      (We’ll send them the sound + your pick!)
+    </p>
+
+    <div class="note-box">
+      <strong>NOTE:</strong><br />
+      After clicking SUBMIT, you’ll be redirected to our WhatsApp account.<br />
+      Remember to use the <b>PASTE</b> option there!
+    </div>
+
+    <button class="submit-btn" onclick="submitTeahug()">
+      SUBMIT
+    </button>
+
+    <button class="close-btn" onclick="closeForm()">✕</button>
+  </div>
+                        </div>
 </body>
 </html>
+
 
 
