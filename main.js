@@ -73,10 +73,10 @@ function buildFeed() {
     songElements.push(card);
 
     // Send button
-    card.querySelector(".sendBtn").onclick = e => {
-      e.stopPropagation();
-      openMessageForm(song);
-    };
+card.querySelector(".sendBtn").onclick = e => {
+  e.stopPropagation();
+  openMoodPicker(song.title); // <-- open Mood Picker instead of old form
+};
 
     // Play overlay
     card.addEventListener("click", () => {
@@ -113,40 +113,9 @@ function stopAll() {
 
 // -----------------
 // Message Form
-function openMessageForm(song) {
-  songTitleEl.textContent = song.title;
-  messagePopup.classList.remove("hidden");
 
-  hugEmojis.forEach(btn => {
-    btn.onclick = () => {
-      hugEmojis.forEach(e => e.classList.remove("selected"));
-      btn.classList.add("selected");
-      selectedEmoji = btn.dataset.emoji;
-    };
-  });
 
-  sendMsgBtn.onclick = () => sendViaWhatsApp(song);
-}
 
-function sendViaWhatsApp(song) {
-  const name = recipientNameInput.value.trim();
-  const number = recipientNumberInput.value.trim();
-  if (!name || !number) return alert("Please enter recipient name and number.");
-  if (!selectedEmoji) return alert("Please select a HugMoji.");
-
-  const fullMessage = `🎵 ${song.title}\nFrom: ${name}\nPhone: ${number}\nFeeling: ${selectedEmoji}\n\nSong link: ${window.location.origin}/?song=${song.id}`;
-
-  navigator.clipboard.writeText(fullMessage)
-    .then(() => {
-      window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
-      alert("Message copied! Paste it in WhatsApp.");
-      messagePopup.classList.add("hidden");
-      recipientNameInput.value = "";
-      recipientNumberInput.value = "";
-      selectedEmoji = "";
-      hugEmojis.forEach(e => e.classList.remove("selected"));
-    });
-}
 
 // -----------------
 // Countdown Logic
@@ -285,3 +254,4 @@ For: ${name}
 
   window.location.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
 }
+
