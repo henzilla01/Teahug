@@ -214,3 +214,74 @@ function updateCountdown() {
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
+// ===============================
+// TEAHUG MOOD + MESSAGE FLOW
+// ===============================
+
+let selectedMood = "";
+let selectedSongTitle = "";
+
+// Call this when user taps SELECT on a song
+function openMoodPicker(songTitle) {
+  selectedSongTitle = songTitle;
+
+  document.getElementById("selectedSongTitle").innerText = songTitle;
+  document.getElementById("moodModal").classList.remove("hidden");
+}
+
+// When user picks Love or Popcorn
+function selectMood(mood) {
+  selectedMood = mood;
+
+  document.getElementById("moodModal").classList.add("hidden");
+  document.getElementById("formModal").classList.remove("hidden");
+
+  const title = document.getElementById("formTitle");
+  title.innerText =
+    mood === "love"
+      ? "You picked ❤️!\nWHO CAME TO MIND?"
+      : "You picked 🍿!\nWHO CAME TO MIND?";
+}
+
+// Close form
+function closeForm() {
+  document.getElementById("formModal").classList.add("hidden");
+  document.getElementById("userName").value = "";
+  document.getElementById("userWhatsapp").value = "";
+}
+
+// Submit & redirect to WhatsApp
+function submitTeahug() {
+  const name = document.getElementById("userName").value.trim();
+  const phone = document.getElementById("userWhatsapp").value.trim();
+
+  if (!name || !phone) {
+    alert("Please fill in all fields");
+    return;
+  }
+
+  // Hug Hour restriction (same as before)
+  const hour = new Date().getHours();
+  if (hour >= 21 && hour < 24) {
+    alert("Hug Hour is active. Please come back after 12AM 💛");
+    return;
+  }
+
+  const moodText = selectedMood === "love" ? "❤️ Love" : "🍿 Popcorn";
+
+  const message = `
+Teahug Surprise 💛
+
+Song: ${selectedSongTitle}
+Mood: ${moodText}
+For: ${name}
+
+(Please paste this message if needed)
+  `;
+
+  const encoded = encodeURIComponent(message);
+  const whatsappNumber = "2348056882601";
+
+  window.location.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
+}
