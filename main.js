@@ -41,9 +41,17 @@ async function loadSongs() {
     const snapshot = await getDocs(collection(db, "songs"));
     allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    allSongs.forEach((song) => {
+    // Prepare looped array for infinite scroll
+    const loopSongs = [...allSongs];
+    if (allSongs.length > 1) {
+      loopSongs.unshift(allSongs[allSongs.length - 1]); // prepend last song
+      loopSongs.push(allSongs[0]); // append first song
+    }
+
+    loopSongs.forEach((song, index) => {
       const card = document.createElement("div");
       card.className = "song-card";
+      card.dataset.index = index;
 
       card.innerHTML = `
         <img class="song-img" src="${song.coverURL}">
@@ -71,6 +79,13 @@ async function loadSongs() {
       songFeed.appendChild(card);
     });
 
+    // Set initial scroll to first real song (index 1)
+    if (allSongs.length > 1) {
+      songFeed.scrollTop = window.innerHeight;
+    }
+
+    observeCards();
+
   } catch (err) {
     console.error(err);
     alert("Failed to load songs. Check console.");
@@ -79,6 +94,41 @@ async function loadSongs() {
 
 function stopAll() {
   audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
+}
+
+// -----------------
+// Auto play with IntersectionObserver
+function observeCards() {
+  const cards = document.querySelectorAll(".song-card");
+  const options = { root: songFeed, threshold: 0.6 };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = Number(entry.target.dataset.index);
+      if (entry.isIntersecting) {
+        stopAll();
+        audioPlayers[idx].play();
+        const overlay = entry.target.querySelector(".play-overlay");
+        if (overlay) overlay.style.display = "none";
+
+        // Infinite scroll handling
+        if (allSongs.length > 1) {
+          if (idx === 0) { // first dummy card
+            songFeed.scrollTop = window.innerHeight * allSongs.length;
+          } else if (idx === allSongs.length + 1) { // last dummy card
+            songFeed.scrollTop = window.innerHeight;
+          }
+        }
+
+      } else {
+        audioPlayers[idx].pause();
+        const overlay = entry.target.querySelector(".play-overlay");
+        if (overlay) overlay.style.display = "block";
+      }
+    });
+  }, options);
+
+  cards.forEach(card => observer.observe(card));
 }
 
 // -----------------
@@ -123,43 +173,31 @@ function updateCountdown() {
   const now = new Date();
   const hour = now.getHours();
 
-  // Pre-hug before 7pm
   if (hour < 19) {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-
-    let target = new Date();
-    target.setHours(19,0,0,0);
+    let target = new Date(); target.setHours(19,0,0,0);
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
-  }
-  // Hug hour 7pm-10pm
-  else if (hour >= 19 && hour < 22) {
+  } else if (hour >= 19 && hour < 22) {
     preHugSection.style.display = "none";
     hugHourTopCountdown.classList.remove("hidden");
     songFeed.style.display = "block";
-
-    let target = new Date();
-    target.setHours(22,0,0,0);
+    let target = new Date(); target.setHours(22,0,0,0);
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     hugHourTimer.textContent = `${h} : ${m} : ${s}`;
-  }
-  // Post hug after 10pm
-  else {
+  } else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-
-    let target = new Date();
-    target.setDate(target.getDate()+1);
-    target.setHours(19,0,0,0);
+    let target = new Date(); target.setDate(target.getDate()+1); target.setHours(19,0,0,0);
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
