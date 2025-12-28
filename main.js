@@ -30,7 +30,6 @@ const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
 const hugHourTimer = document.getElementById("hugHourTimer");
 
 let allSongs = [];
-let songElements = [];
 let audioPlayers = [];
 let selectedEmoji = "";
 
@@ -59,7 +58,6 @@ async function loadSongs() {
 // Build Feed
 function buildFeed() {
   songFeed.innerHTML = "";
-  songElements = [];
   audioPlayers = [];
 
   if (!allSongs.length) {
@@ -67,9 +65,10 @@ function buildFeed() {
     return;
   }
 
+  // Add extra first and last for infinite scroll illusion
   const loopSongs = [allSongs[allSongs.length -1], ...allSongs, allSongs[0]];
 
-  loopSongs.forEach(song => {
+  loopSongs.forEach((song, index) => {
     const card = document.createElement("div");
     card.classList.add("song-card");
     card.innerHTML = `
@@ -81,24 +80,23 @@ function buildFeed() {
     const audio = new Audio(song.songURL);
     audio.loop = true;
     audioPlayers.push(audio);
-    songElements.push(card);
 
-    // Select button opens Mood Picker
-    card.querySelector(".sendBtn").onclick = e => {
+    // Play overlay click
+    card.addEventListener("click", () => {
+      if (audio.paused) {
+        stopAll();
+        audio.play();
+        card.querySelector(".play-overlay").style.display = "none";
+      } else {
+        audio.pause();
+        card.querySelector(".play-overlay").style.display = "block";
+      }
+    });
+
+    // Select button → Mood Picker
+    card.querySelector(".sendBtn").addEventListener("click", (e) => {
       e.stopPropagation();
       openMoodPicker(song.title);
-    };
-
-    // Play overlay
-    card.addEventListener("click", () => {
-      if (audio.paused) { 
-        stopAll();
-        audio.play(); 
-        card.querySelector(".play-overlay").style.display = "none"; 
-      } else { 
-        audio.pause(); 
-        card.querySelector(".play-overlay").style.display = "block"; 
-      }
     });
 
     songFeed.appendChild(card);
@@ -112,14 +110,17 @@ function enableInfiniteScroll() {
   songFeed.addEventListener("scroll", () => {
     const scrollIndex = Math.round(songFeed.scrollTop / window.innerHeight);
     if (scrollIndex === 0) songFeed.scrollTop = allSongs.length * window.innerHeight;
-    else if (scrollIndex === songElements.length -1) songFeed.scrollTop = window.innerHeight;
+    else if (scrollIndex === audioPlayers.length -1) songFeed.scrollTop = window.innerHeight;
     stopAll();
     audioPlayers[scrollIndex]?.play();
   });
 }
 
-function stopAll() { 
-  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; }); 
+function stopAll() {
+  audioPlayers.forEach(a => {
+    a.pause();
+    a.currentTime = 0;
+  });
 }
 
 // -----------------
