@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ---------------- FIREBASE CONFIG ----------------
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -13,168 +13,163 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ---------------- DOM ELEMENTS ----------------
+// DOM
 const preHugSection = document.getElementById("preHugSection");
 const preHugCountdown = document.getElementById("preHugCountdown");
 const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
 const hugHourTimer = document.getElementById("hugHourTimer");
 const songFeed = document.getElementById("songFeed");
 const introPopup = document.getElementById("introPopup");
-
-// Mood & form
-const moodModal = document.getElementById("moodModal");
-const formModal = document.getElementById("formModal");
-const selectedSongTitleEl = document.getElementById("selectedSongTitle");
-const formTitleEl = document.getElementById("formTitle");
-const userNameEl = document.getElementById("userName");
-const userWhatsappEl = document.getElementById("userWhatsapp");
+const messagePopup = document.getElementById("messagePopup");
+const songTitleEl = document.getElementById("songTitle");
+const recipientNameInput = document.getElementById("recipientName");
+const recipientNumberInput = document.getElementById("recipientNumber");
+const sendMsgBtn = document.getElementById("sendMsgBtn");
+const hugEmojis = document.querySelectorAll(".hug-emoji");
 
 let allSongs = [];
-let selectedMood = "";
-let selectedSongTitle = "";
+let audioPlayers = [];
+let selectedSong = null;
+let selectedEmoji = "";
 
-// ---------------- HELPER FUNCTIONS ----------------
-window.closeForm = () => formModal.classList.add("hidden");
-
-function showIntroPopup() {
-  introPopup.classList.remove("hidden");
-  setTimeout(() => introPopup.classList.add("hidden"), 10000);
-}
-
-// ---------------- LOAD SONGS ----------------
+// -----------------
+// Load Songs
 async function loadSongs() {
+  songFeed.innerHTML = "";
+  audioPlayers = [];
   try {
     const snapshot = await getDocs(collection(db, "songs"));
     allSongs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    buildFeed();
+
+    allSongs.forEach((song) => {
+      const card = document.createElement("div");
+      card.className = "song-card";
+
+      card.innerHTML = `
+        <img class="song-img" src="${song.coverURL}">
+        <div class="play-overlay">▶</div>
+        <button class="sendBtn">Select</button>
+      `;
+
+      const audio = new Audio(song.songURL);
+      audio.loop = true;
+      audioPlayers.push(audio);
+
+      const overlay = card.querySelector(".play-overlay");
+      const selectBtn = card.querySelector(".sendBtn");
+
+      overlay.addEventListener("click", () => {
+        if (audio.paused) { stopAll(); audio.play(); overlay.style.display = "none"; }
+        else { audio.pause(); overlay.style.display = "block"; }
+      });
+
+      selectBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        openMessageForm(song);
+      });
+
+      songFeed.appendChild(card);
+    });
+
   } catch (err) {
-    console.error("Failed to load songs", err);
-    songFeed.innerHTML = "<p style='color:red;'>Failed to load songs</p>";
+    console.error(err);
+    alert("Failed to load songs. Check console.");
   }
 }
 
-// ---------------- BUILD SONG FEED ----------------
-function buildFeed() {
-  songFeed.innerHTML = "";
-  allSongs.forEach(song => {
-    const card = document.createElement("div");
-    card.className = "song-card";
-    card.innerHTML = `
-      <img src="${song.coverURL}" class="song-img">
-      <div class="song-info">
-        <h3>${song.title}</h3>
-        <p>${song.artist}</p>
-        <button class="selectBtn">Select</button>
-      </div>
-    `;
+function stopAll() {
+  audioPlayers.forEach(a => { a.pause(); a.currentTime = 0; });
+}
 
-    card.querySelector(".selectBtn").onclick = () => openMoodPicker(song.title);
+// -----------------
+// Message Form
+function openMessageForm(song) {
+  selectedSong = song;
+  songTitleEl.textContent = song.title;
+  messagePopup.classList.remove("hidden");
 
-    songFeed.appendChild(card);
+  hugEmojis.forEach(btn => {
+    btn.onclick = () => {
+      hugEmojis.forEach(e => e.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedEmoji = btn.dataset.emoji;
+    };
   });
 }
 
-// ---------------- MOOD PICKER ----------------
-function openMoodPicker(title) {
-  selectedSongTitle = title;
-  selectedSongTitleEl.innerText = title;
-  moodModal.classList.remove("hidden");
-}
+sendMsgBtn.onclick = () => {
+  if (!selectedSong) return;
+  const name = recipientNameInput.value.trim();
+  const number = recipientNumberInput.value.trim();
+  if (!name || !number) return alert("Enter name and number.");
+  if (!selectedEmoji) return alert("Select a HugMoji.");
 
-window.selectMood = (mood) => {
-  selectedMood = mood;
-  moodModal.classList.add("hidden");
-
-  // Show form modal
-  formModal.classList.remove("hidden");
-  formTitleEl.innerText = mood === "love" ? "You picked ❤️! WHO CAME TO MIND?" : "You picked 🍿! WHO CAME TO MIND?";
+  const msg = `🎵 ${selectedSong.title}\nFrom: ${name}\nPhone: ${number}\nFeeling: ${selectedEmoji}\n\nSong link: ${window.location.origin}/?song=${selectedSong.id}`;
+  navigator.clipboard.writeText(msg).then(() => {
+    alert("Message copied! Paste in WhatsApp.");
+    messagePopup.classList.add("hidden");
+    recipientNameInput.value = "";
+    recipientNumberInput.value = "";
+    hugEmojis.forEach(e => e.classList.remove("selected"));
+    selectedEmoji = "";
+  });
 };
 
-// ---------------- SUBMIT FORM ----------------
-window.submitTeahug = () => {
-  const name = userNameEl.value.trim();
-  const phone = userWhatsappEl.value.trim();
+window.closeMessageForm = () => messagePopup.classList.add("hidden");
 
-  if (!name || !phone) return alert("Please fill in all fields.");
-  if (!selectedMood) return alert("Select a mood first.");
-
-  const moodText = selectedMood === "love" ? "❤️ Love" : "🍿 Popcorn";
-
-  const message = `
-Teahug Surprise 💛
-
-Song: ${selectedSongTitle}
-Mood: ${moodText}
-For: ${name}
-
-(Paste this in WhatsApp)
-  `;
-
-  navigator.clipboard.writeText(message)
-    .then(() => {
-      window.open("https://wa.me/message/WU7FM2NLOXI6P1", "_blank");
-      alert("Message copied! Paste it in WhatsApp.");
-      formModal.classList.add("hidden");
-      userNameEl.value = "";
-      userWhatsappEl.value = "";
-      selectedMood = "";
-    });
-};
-
-// ---------------- COUNTDOWN ----------------
+// -----------------
+// Countdown
 function updateCountdown() {
   const now = new Date();
   const hour = now.getHours();
 
-  // PRE-HUG: before 7 PM
+  // Pre-hug before 7pm
   if (hour < 19) {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-    introPopup.classList.add("hidden");
 
-    const target = new Date();
+    let target = new Date();
     target.setHours(19,0,0,0);
     const diff = target - now;
-    const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
-    const m = String(Math.floor(diff / 60000 % 60)).padStart(2, "0");
-    const s = String(Math.floor(diff / 1000 % 60)).padStart(2, "0");
+    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
+    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
   }
-  // HUG HOUR: 7 PM - 10 PM
+  // Hug hour 7pm-10pm
   else if (hour >= 19 && hour < 22) {
     preHugSection.style.display = "none";
     hugHourTopCountdown.classList.remove("hidden");
-    songFeed.style.display = "flex";
+    songFeed.style.display = "block";
 
-    const target = new Date();
+    let target = new Date();
     target.setHours(22,0,0,0);
     const diff = target - now;
-    const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
-    const m = String(Math.floor(diff / 60000 % 60)).padStart(2, "0");
-    const s = String(Math.floor(diff / 1000 % 60)).padStart(2, "0");
+    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
+    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     hugHourTimer.textContent = `${h} : ${m} : ${s}`;
-
-    if (h === "03" && m === "00" && s === "00") showIntroPopup();
   }
-  // POST-HUG: after 10 PM
+  // Post hug after 10pm
   else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
 
-    const target = new Date();
+    let target = new Date();
     target.setDate(target.getDate()+1);
     target.setHours(19,0,0,0);
     const diff = target - now;
-    const h = String(Math.floor(diff / 3600000)).padStart(2, "0");
-    const m = String(Math.floor(diff / 60000 % 60)).padStart(2, "0");
-    const s = String(Math.floor(diff / 1000 % 60)).padStart(2, "0");
+    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
+    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
   }
 }
 
-// ---------------- START ----------------
+// -----------------
+// Start
 loadSongs();
 updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(updateCountdown,1000);
