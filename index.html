@@ -14,9 +14,7 @@
       <div class="countdown-label">Hugshour will be LIVE in</div>
       <div id="preHugCountdown">00 : 00 : 00</div>
       <div class="countdown-sub">Daily, 7 PM – 10 PM</div>
-      <div class="countdown-tagline">
-        NO SIGN UP - NO MESSAGES - JUST HUGS
-      </div>
+      <div class="countdown-tagline">NO SIGN UP - NO MESSAGES - JUST HUGS</div>
     </div>
   </div>
 
@@ -31,48 +29,26 @@
   <!-- INTRO POPUP -->
   <div id="introPopup" class="popup intro-popup hidden">
     <h2>Welcome to HugsHour LIVE! 🎉</h2>
-    <p>No signups. No messages. Just hugs.
-Discover the perfect song for your hug 💫</p>
+    <p>No signups. No messages. Just hugs. Discover the perfect song for your hug 💫</p>
   </div>
 
-  <!-- MESSAGE POPUP -->
-  <div id="messagePopup" class="popup message-popup hidden">
-    <h3 id="songTitle">Song Title</h3>
-    <p>Recipient Details:</p>
-    <input type="text" id="recipientName" placeholder="Recipient Name">
-    <input type="text" id="recipientNumber" placeholder="Recipient Phone Number">
-    <p>Choose a Feeling HugMoji (LOVE or POPCORN?)</p>
-    <div class="hugmoji-container">
-      <button class="hug-emoji" data-emoji="❤️">❤️</button>
-      <button class="hug-emoji" data-emoji="🍿">🍿</button>
-    </div>
-    <button id="sendMsgBtn">Copy</button>
-    <button onclick="closeMessageForm()">Close</button>
-  </div>
-
-  <!-- Mood Picker Modal -->
+  <!-- MOOD PICKER MODAL -->
   <div id="moodModal" class="modal hidden">
     <div class="modal-card neon">
       <h2 class="modal-title">Love or Popcorn?</h2>
       <div class="mood-options">
-        <button class="mood-btn love" onclick="selectMood('love')">
-          ❤️ <span>Team Love</span>
-        </button>
-        <button class="mood-btn popcorn" onclick="selectMood('popcorn')">
-          🍿 <span>Team Popcorn</span>
-        </button>
+        <button class="mood-btn love" onclick="selectMood('love')">❤️<span>Team Love</span></button>
+        <button class="mood-btn popcorn" onclick="selectMood('popcorn')">🍿<span>Team Popcorn</span></button>
       </div>
       <p class="modal-footer-text">Listen with your Heart</p>
     </div>
   </div>
 
-  <!-- Message Form Modal -->
+  <!-- MESSAGE FORM MODAL -->
   <div id="formModal" class="modal hidden">
     <div class="modal-card neon">
       <h2 id="formTitle"></h2>
-      <p class="song-label">
-        🎵 Song: <span id="selectedSongTitle"></span>
-      </p>
+      <p>🎵 Song: <span id="selectedSongTitle"></span></p>
       <input type="text" id="userName" placeholder="Name" required />
       <input type="tel" id="userWhatsapp" placeholder="WhatsApp Contact" required />
       <p class="helper-text">(We’ll send them the sound + your pick!)</p>
