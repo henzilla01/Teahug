@@ -1,11 +1,28 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// DOM Elements
 const uploadForm = document.getElementById("uploadForm");
 const adminStatus = document.getElementById("adminStatus");
 const songList = document.getElementById("songList");
 
-// Replace with your actual Cloudinary details
+// Cloudinary
 const CLOUD_NAME = "dmi3n8io4";
-const UPLOAD_PRESET = "unsigned_preset"; // create unsigned upload preset in Cloudinary
+const UPLOAD_PRESET = "unsigned_preset";
 
+// Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
+  authDomain: "joinhugparty.firebaseapp.com",
+  projectId: "joinhugparty",
+  storageBucket: "joinhugparty.firebasestorage.app",
+  messagingSenderId: "540501854830",
+  appId: "1:540501854830:web:7249bb97b50582fe97747f"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Upload Form
 uploadForm.addEventListener("submit", async e => {
   e.preventDefault();
   adminStatus.textContent = "Uploading...";
@@ -37,7 +54,6 @@ uploadForm.addEventListener("submit", async e => {
     const songJson = await songRes.json();
     const coverJson = await coverRes.json();
 
-    // Save metadata to Firestore
     await addDoc(collection(db, "songs"), {
       title,
       artist,
@@ -48,17 +64,23 @@ uploadForm.addEventListener("submit", async e => {
 
     adminStatus.textContent = "Song uploaded successfully!";
     uploadForm.reset();
-    loadSongs();
+    loadAdminSongs();
   } catch (err) {
     console.error(err);
     adminStatus.textContent = "Upload failed! Check console.";
   }
 });
 
-// Load all songs in admin
-async function loadSongs() {
+// Load admin songs
+async function loadAdminSongs() {
   songList.innerHTML = "";
   const snapshot = await getDocs(collection(db, "songs"));
+
+  if (snapshot.empty) {
+    songList.innerHTML = "<p style='opacity:0.7;text-align:center'>No songs yet.</p>";
+    return;
+  }
+
   snapshot.forEach(doc => {
     const s = doc.data();
     const div = document.createElement("div");
@@ -75,4 +97,4 @@ async function loadSongs() {
 }
 
 // Initial load
-loadSongs();
+loadAdminSongs();
