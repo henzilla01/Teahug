@@ -32,15 +32,29 @@
     <p>No signups. No messages. Just hugs. Discover the perfect song for your hug 💫</p>
   </div>
 
-  <!-- MOOD PICKER MODAL -->
-  <div id="moodModal" class="modal hidden">
-    <div class="modal-card neon">
-      <h2 class="modal-title">Love or Popcorn?</h2>
-      <div class="mood-options">
-        <button class="mood-btn love" onclick="selectMood('love')">❤️<span>Team Love</span></button>
-        <button class="mood-btn popcorn" onclick="selectMood('popcorn')">🍿<span>Team Popcorn</span></button>
+  <!-- FULLSCREEN MOOD PICKER -->
+  <div id="moodModal" class="mood-fullscreen hidden">
+    <button class="mood-close" onclick="closeMood()">✕</button>
+
+    <div class="mood-header">
+      Love or Popcorn?
+      <div class="mood-timer">Ends in <span id="moodTimer">00:00</span></div>
+    </div>
+
+    <div class="mood-big-options">
+      <div class="mood-big-btn" onclick="selectMood('love')">
+        ❤️
+        <span>Team Love</span>
       </div>
-      <p class="modal-footer-text">Listen with your Heart</p>
+
+      <div class="mood-big-btn" onclick="selectMood('popcorn')">
+        🍿
+        <span>Team Popcorn</span>
+      </div>
+    </div>
+
+    <div class="mood-footer">
+      Listen with your Heart
     </div>
   </div>
 
@@ -63,51 +77,5 @@
   </div>
 
   <script type="module" src="main.js"></script>
-  <!-- LOVE / POPCORN CHOICE MODAL -->
-<div id="choiceModal" class="modal">
-  <div class="modal-content animate">
-    <span class="close" onclick="closeChoice()">&times;</span>
-    <h2>Love or Popcorn?</h2>
-    <div id="timer">Ends in: 05:00</div>
-
-    <div class="choice-container">
-      <div class="choice" onclick="selectChoice('love')">
-        <div class="icon love">❤️</div>
-        <p>Team Love</p>
-      </div>
-
-      <div class="choice" onclick="selectChoice('popcorn')">
-        <div class="icon popcorn">🍿</div>
-        <p>Team Popcorn</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- FORM MODAL -->
-<div id="formModal" class="modal">
-  <div class="modal-content animate">
-    <span class="close" onclick="closeForm()">&times;</span>
-    <h3 id="formTitle"></h3>
-
-    <form onsubmit="sendToWhatsApp(event)">
-      <label>Name:</label>
-      <input type="text" id="userName" required>
-
-      <label>WhatsApp Contact:</label>
-      <input type="tel" id="userNumber" required>
-
-      <p class="note">
-        We'll send them the sound + your pick!<br><br>
-        NOTE:<br>
-        After clicking SUBMIT, you'll be redirected to our WhatsApp account.<br>
-        Remember to use the PASTE option there!
-      </p>
-
-      <button type="submit">SUBMIT</button>
-    </form>
-  </div>
-</div>
 </body>
 </html>
-
