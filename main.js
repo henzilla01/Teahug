@@ -126,12 +126,24 @@ window.submitTeahug = () => {
   const phone = document.getElementById("userWhatsapp").value.trim();
   if (!name || !phone) return alert("Fill all fields");
 
-  const moodText = selectedMood === "love" ? "❤️ Love" : "🍿 Popcorn";
-  const message = `Teahug Surprise 💛\nSong: ${selectedSongTitle}\nMood: ${moodText}\nFor: ${name}`;
+  const moodText = selectedMood === "love" ? "❤️ *Love* 💖" : "🍿 *Popcorn* 🎬";
+
+  // Formatted, playful message
+  const message = `💛 *Teahug Surprise!*
+🎵 Song: *${selectedSongTitle}*
+🌟 Mood: ${moodText}
+👤 For: *${name}*
+📞 Contact: ${phone}
+
+✨ Sent with ❤️ from HugsHour!`;
+
   const encoded = encodeURIComponent(message);
+
+  // Send to your WhatsApp number
   const whatsappNumber = "2348056882601";
   window.location.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
-  formModal.classList.remove("active");
+
+  formModal.classList.add("hidden");
 };
 
 // Countdown logic (unchanged)
@@ -176,3 +188,4 @@ function updateCountdown() {
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
