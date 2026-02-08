@@ -86,7 +86,7 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   background: linear-gradient(145deg, #111, #1a1a1a);
   padding: 30px 25px;
   border-radius: 20px;
-  width: 90%;
+  width: 150%;
   max-width: 420px;
   max-height: 80vh;            /* fits screen height */
   display: flex;
@@ -158,3 +158,4 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   #formModal input { font-size: 0.95rem; padding: 10px; }
   #formModal .submit-btn, #formModal .close-btn { padding: 10px 20px; font-size: 0.95rem; }
   }
+
