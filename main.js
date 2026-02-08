@@ -84,7 +84,11 @@ function buildFeed() {
     selectBtn.addEventListener("click", () => {
       selectedSongTitle = song.title;
       document.getElementById("selectedSongTitle").innerText = selectedSongTitle;
+
+      // Show fullscreen mood modal
       moodModal.classList.remove("hidden");
+      moodModal.style.display = "flex";
+      startMoodTimer();
     });
   });
 
@@ -117,9 +121,16 @@ function buildFeed() {
 window.selectMood = (mood) => {
   selectedMood = mood;
   moodModal.classList.add("hidden");
+  moodModal.style.display = "none";
+
   formModal.classList.remove("hidden");
   const title = document.getElementById("formTitle");
   title.innerText = mood === "love" ? "You picked ❤️!\nWHO CAME TO MIND?" : "You picked 🍿!\nWHO CAME TO MIND?";
+};
+
+window.closeMood = () => {
+  moodModal.classList.add("hidden");
+  moodModal.style.display = "none";
 };
 
 window.closeForm = () => formModal.classList.add("hidden");
@@ -137,6 +148,31 @@ window.submitTeahug = () => {
   window.location.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
   formModal.classList.add("hidden");
 };
+
+/* ----------------- Mood Timer ----------------- */
+function startMoodTimer(){
+  const el = document.getElementById("moodTimer");
+
+  function update(){
+    const now = new Date();
+    const target = new Date();
+    target.setHours(22,0,0,0);
+
+    const diff = target - now;
+    if(diff <= 0){
+      el.textContent = "00:00";
+      return;
+    }
+
+    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
+
+    el.textContent = `${m}:${s}`;
+  }
+
+  update();
+  setInterval(update,1000);
+}
 
 /* ----------------- Countdown ----------------- */
 function updateCountdown() {
@@ -186,71 +222,3 @@ function updateCountdown() {
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
-let selectedTeam = "";
-let selectedSong = "";
-
-// Call this when a song is clicked
-function openChoice(songName) {
-  selectedSong = songName;
-  document.getElementById("choiceModal").style.display = "block";
-  startTimer(300); // 5 minutes
-}
-
-function closeChoice() {
-  document.getElementById("choiceModal").style.display = "none";
-}
-
-function selectChoice(team) {
-  selectedTeam = team;
-  closeChoice();
-
-  const title = team === "love"
-    ? "You picked ❤️! WHO CAME TO MIND?"
-    : "You picked 🍿! WHO CAME TO MIND?";
-
-  document.getElementById("formTitle").innerText = title;
-  document.getElementById("formModal").style.display = "block";
-}
-
-function closeForm() {
-  document.getElementById("formModal").style.display = "none";
-}
-
-// Timer
-function startTimer(seconds) {
-  let time = seconds;
-  const timerDisplay = document.getElementById("timer");
-
-  const interval = setInterval(() => {
-    let min = Math.floor(time / 60);
-    let sec = time % 60;
-    timerDisplay.innerText = `Ends in: ${min}:${sec < 10 ? '0' : ''}${sec}`;
-    time--;
-
-    if (time < 0) {
-      clearInterval(interval);
-      closeChoice();
-    }
-  }, 1000);
-}
-
-// WhatsApp sending (uses your existing logic style)
-function sendToWhatsApp(e) {
-  e.preventDefault();
-
-  const name = document.getElementById("userName").value;
-  const number = document.getElementById("userNumber").value;
-
-  const message =
-    `Hello!%0A` +
-    `Name: ${name}%0A` +
-    `Contact: ${number}%0A` +
-    `Song: ${selectedSong}%0A` +
-    `Team: ${selectedTeam}`;
-
-  const whatsappNumber = "2348056882601"; // Replace with your number
-  window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
-
-  closeForm();
-}
-
