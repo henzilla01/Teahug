@@ -71,6 +71,28 @@ function buildFeed() {
 
     selectBtn.addEventListener("click", () => handleSelectSong(song.title));
   });
+
+  // Auto-play using Intersection Observer
+  const cards = document.querySelectorAll(".song-card");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting) {
+        const idx = Array.from(cards).indexOf(entry.target);
+        const song = loopSongs[idx];
+        if(currentAudio) currentAudio.pause();
+        currentAudio = new Audio(song.songURL);
+        currentAudio.play();
+        document.querySelectorAll(".play-overlay").forEach(p => p.style.display="block");
+        entry.target.querySelector(".play-overlay").style.display="none";
+
+        // Infinite scroll
+        if(idx === 0) songFeed.scrollTop = cards[cards.length-2].offsetTop;
+        if(idx === cards.length-1) songFeed.scrollTop = cards[1].offsetTop;
+      }
+    });
+  }, { threshold: 0.7 });
+
+  cards.forEach(card => observer.observe(card));
 }
 
 // Handle select
