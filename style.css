@@ -84,9 +84,9 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
 /* ----------------- Form Modal ----------------- */
 #formModal .modal-card {
   background: linear-gradient(145deg, #111, #1a1a1a);
-  padding: 30px 25px;
+  padding: 40px 25px;
   border-radius: 20px;
-  width: 150%;
+  width: 175%;
   max-width: 420px;
   max-height: 80vh;            /* fits screen height */
   display: flex;
@@ -100,7 +100,7 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
 
 /* Scrollable content inside if needed */
 #formModal .modal-card-content {
-  width: 100%;
+  width: 170%;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -158,4 +158,5 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   #formModal input { font-size: 0.95rem; padding: 10px; }
   #formModal .submit-btn, #formModal .close-btn { padding: 10px 20px; font-size: 0.95rem; }
   }
+
 
