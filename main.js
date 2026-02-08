@@ -186,3 +186,71 @@ function updateCountdown() {
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
+let selectedTeam = "";
+let selectedSong = "";
+
+// Call this when a song is clicked
+function openChoice(songName) {
+  selectedSong = songName;
+  document.getElementById("choiceModal").style.display = "block";
+  startTimer(300); // 5 minutes
+}
+
+function closeChoice() {
+  document.getElementById("choiceModal").style.display = "none";
+}
+
+function selectChoice(team) {
+  selectedTeam = team;
+  closeChoice();
+
+  const title = team === "love"
+    ? "You picked ❤️! WHO CAME TO MIND?"
+    : "You picked 🍿! WHO CAME TO MIND?";
+
+  document.getElementById("formTitle").innerText = title;
+  document.getElementById("formModal").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("formModal").style.display = "none";
+}
+
+// Timer
+function startTimer(seconds) {
+  let time = seconds;
+  const timerDisplay = document.getElementById("timer");
+
+  const interval = setInterval(() => {
+    let min = Math.floor(time / 60);
+    let sec = time % 60;
+    timerDisplay.innerText = `Ends in: ${min}:${sec < 10 ? '0' : ''}${sec}`;
+    time--;
+
+    if (time < 0) {
+      clearInterval(interval);
+      closeChoice();
+    }
+  }, 1000);
+}
+
+// WhatsApp sending (uses your existing logic style)
+function sendToWhatsApp(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("userName").value;
+  const number = document.getElementById("userNumber").value;
+
+  const message =
+    `Hello!%0A` +
+    `Name: ${name}%0A` +
+    `Contact: ${number}%0A` +
+    `Song: ${selectedSong}%0A` +
+    `Team: ${selectedTeam}`;
+
+  const whatsappNumber = "2348056882601"; // Replace with your number
+  window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+
+  closeForm();
+}
+
