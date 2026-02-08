@@ -21,16 +21,13 @@ const preHugCountdown = document.getElementById("preHugCountdown");
 const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
 const hugHourTimer = document.getElementById("hugHourTimer");
 
-/* Modals */
-let selectedMood = "";
-let selectedSongTitle = "";
 const moodModal = document.getElementById("moodModal");
 const formModal = document.getElementById("formModal");
+let selectedMood = "";
+let selectedSongTitle = "";
 
-/* State */
 let allSongs = [];
 let currentAudio = null;
-let currentIndex = 0;
 
 /* ----------------- Popups ----------------- */
 function showIntroPopup() {
@@ -55,10 +52,7 @@ async function loadSongs() {
 function buildFeed() {
   songFeed.innerHTML = "";
 
-  // Duplicate first and last for smooth infinite
-  const loopSongs = [allSongs[allSongs.length-1], ...allSongs, allSongs[0]];
-
-  loopSongs.forEach((song, idx) => {
+  allSongs.forEach((song) => {
     const card = document.createElement("div");
     card.classList.add("song-card");
     card.innerHTML = `
@@ -71,45 +65,44 @@ function buildFeed() {
     const playOverlay = card.querySelector(".play-overlay");
     const selectBtn = card.querySelector(".sendBtn");
 
-    /* Play/Pause */
+    // Play/Pause song
     playOverlay.addEventListener("click", () => {
       if (!currentAudio) currentAudio = new Audio(song.songURL);
-      if (currentAudio.src !== song.songURL) { currentAudio.pause(); currentAudio = new Audio(song.songURL); }
-
-      if (currentAudio.paused) { currentAudio.play(); playOverlay.style.display="none"; }
-      else { currentAudio.pause(); playOverlay.style.display="block"; }
+      if (currentAudio.src !== song.songURL) {
+        currentAudio.pause();
+        currentAudio = new Audio(song.songURL);
+      }
+      if (currentAudio.paused) {
+        currentAudio.play();
+        playOverlay.style.display = "none";
+      } else {
+        currentAudio.pause();
+        playOverlay.style.display = "block";
+      }
     });
 
-    /* Select Button */
+    // Select button - show mood modal
     selectBtn.addEventListener("click", () => {
       selectedSongTitle = song.title;
       document.getElementById("selectedSongTitle").innerText = selectedSongTitle;
-
-      // Show fullscreen mood modal
       moodModal.classList.remove("hidden");
-      moodModal.style.display = "flex";
-      startMoodTimer();
     });
   });
 
-  /* Intersection Observer for auto-play and infinite scroll */
+  // Auto-play and infinite scroll
   const cards = document.querySelectorAll(".song-card");
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         const index = Array.from(cards).indexOf(entry.target);
-        let song = loopSongs[index];
+        const song = allSongs[index % allSongs.length]; // wrap around
         if (currentAudio) currentAudio.pause();
         currentAudio = new Audio(song.songURL);
         currentAudio.play();
 
-        // Hide all overlays
-        document.querySelectorAll(".play-overlay").forEach(p => p.style.display="block");
-        entry.target.querySelector(".play-overlay").style.display="none";
-
-        // Infinite scroll
-        if (index === 0) songFeed.scrollTop = cards[cards.length-2].offsetTop;
-        if (index === cards.length-1) songFeed.scrollTop = cards[1].offsetTop;
+        // hide all overlays
+        document.querySelectorAll(".play-overlay").forEach(p => p.style.display = "block");
+        entry.target.querySelector(".play-overlay").style.display = "none";
       }
     });
   }, { threshold: 0.7 });
@@ -121,16 +114,10 @@ function buildFeed() {
 window.selectMood = (mood) => {
   selectedMood = mood;
   moodModal.classList.add("hidden");
-  moodModal.style.display = "none";
-
   formModal.classList.remove("hidden");
+
   const title = document.getElementById("formTitle");
   title.innerText = mood === "love" ? "You picked ❤️!\nWHO CAME TO MIND?" : "You picked 🍿!\nWHO CAME TO MIND?";
-};
-
-window.closeMood = () => {
-  moodModal.classList.add("hidden");
-  moodModal.style.display = "none";
 };
 
 window.closeForm = () => formModal.classList.add("hidden");
@@ -149,72 +136,37 @@ window.submitTeahug = () => {
   formModal.classList.add("hidden");
 };
 
-/* ----------------- Mood Timer ----------------- */
-function startMoodTimer(){
-  const el = document.getElementById("moodTimer");
-
-  function update(){
-    const now = new Date();
-    const target = new Date();
-    target.setHours(22,0,0,0);
-
-    const diff = target - now;
-    if(diff <= 0){
-      el.textContent = "00:00";
-      return;
-    }
-
-    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
-
-    el.textContent = `${m}:${s}`;
-  }
-
-  update();
-  setInterval(update,1000);
-}
-
 /* ----------------- Countdown ----------------- */
 function updateCountdown() {
   const now = new Date();
   const hour = now.getHours();
 
   if (hour < 19) { // pre-hug
-    preHugSection.style.display="flex";
+    preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
-    songFeed.style.display="none";
-
-    let target = new Date(); target.setHours(19,0,0,0);
-    const diff = target-now;
-    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
-    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
-    preHugCountdown.textContent = `${h} : ${m} : ${s}`;
-  } else if (hour>=19 && hour<22) { // hug hour
-    preHugSection.style.display="none";
-    hugHourTopCountdown.classList.remove("hidden");
-    songFeed.style.display="block";
-
-    let target = new Date(); target.setHours(22,0,0,0);
-    const diff = target-now;
-    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
-    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
-    hugHourTimer.textContent = `${h} : ${m} : ${s}`;
-
-    if (h==="03" && m==="00" && s==="00") showIntroPopup();
-  } else { // post-hug
-    preHugSection.style.display="flex";
-    hugHourTopCountdown.classList.add("hidden");
-    songFeed.style.display="none";
-
-    let target = new Date(); target.setDate(target.getDate()+1);
+    songFeed.style.display = "none";
+    const target = new Date();
     target.setHours(19,0,0,0);
     const diff = target-now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
+  } else if (hour >= 19 && hour < 22) { // hug hour
+    preHugSection.style.display = "none";
+    hugHourTopCountdown.classList.remove("hidden");
+    songFeed.style.display = "block";
+    const target = new Date();
+    target.setHours(22,0,0,0);
+    const diff = target-now;
+    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
+    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
+    hugHourTimer.textContent = `${h} : ${m} : ${s}`;
+  } else { // post-hug
+    preHugSection.style.display = "flex";
+    hugHourTopCountdown.classList.add("hidden");
+    songFeed.style.display = "none";
   }
 }
 
