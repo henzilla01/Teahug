@@ -87,7 +87,7 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   padding: 40px 25px;
   border-radius: 20px;
   width: 175%;
-  max-width: 420px;
+  max-width: 500px;
   max-height: 80vh;            /* fits screen height */
   display: flex;
   flex-direction: column;
@@ -158,5 +158,6 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   #formModal input { font-size: 0.95rem; padding: 10px; }
   #formModal .submit-btn, #formModal .close-btn { padding: 10px 20px; font-size: 0.95rem; }
   }
+
 
 
