@@ -32,29 +32,16 @@
     <p>No signups. No messages. Just hugs. Discover the perfect song for your hug 💫</p>
   </div>
 
-  <!-- FULLSCREEN MOOD PICKER -->
-  <div id="moodModal" class="mood-fullscreen hidden">
-    <button class="mood-close" onclick="closeMood()">✕</button>
-
-    <div class="mood-header">
-      Love or Popcorn?
-      <div class="mood-timer">Ends in <span id="moodTimer">00:00</span></div>
-    </div>
-
-    <div class="mood-big-options">
-      <div class="mood-big-btn" onclick="selectMood('love')">
-        ❤️
-        <span>Team Love</span>
+  <!-- MOOD PICKER MODAL -->
+  <div id="moodModal" class="modal hidden">
+    <div class="modal-card neon">
+      <h2 class="modal-title">Love or Popcorn?</h2>
+      <div class="mood-options">
+        <button class="mood-btn love" onclick="selectMood('love')">❤️<span>Team Love</span></button>
+        <button class="mood-btn popcorn" onclick="selectMood('popcorn')">🍿<span>Team Popcorn</span></button>
       </div>
-
-      <div class="mood-big-btn" onclick="selectMood('popcorn')">
-        🍿
-        <span>Team Popcorn</span>
-      </div>
-    </div>
-
-    <div class="mood-footer">
-      Listen with your Heart
+      <p class="modal-footer-text">Listen with your Heart</p>
+      <button class="close-btn" onclick="closeForm()">✕</button>
     </div>
   </div>
 
