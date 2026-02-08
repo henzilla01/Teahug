@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// ----------------- Firebase -----------------
+// Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAeOEO_5kOqqQU845sSKOsaeJzFmk-MauY",
   authDomain: "joinhugparty.firebaseapp.com",
@@ -13,9 +13,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ----------------- DOM -----------------
+// DOM
 const songFeed = document.getElementById("songFeed");
-const introPopup = document.getElementById("introPopup");
 const preHugSection = document.getElementById("preHugSection");
 const preHugCountdown = document.getElementById("preHugCountdown");
 const hugHourTopCountdown = document.getElementById("hugHourTopCountdown");
@@ -31,13 +30,7 @@ const formModal = document.getElementById("formModal");
 let allSongs = [];
 let currentAudio = null;
 
-// ----------------- Popups -----------------
-function showIntroPopup() {
-  introPopup.classList.add("active");
-  setTimeout(() => introPopup.classList.remove("active"), 10000);
-}
-
-// ----------------- Load Songs -----------------
+// Load songs
 async function loadSongs() {
   try {
     const snapshot = await getDocs(collection(db, "songs"));
@@ -50,14 +43,12 @@ async function loadSongs() {
   }
 }
 
-// ----------------- Build Feed -----------------
+// Build feed
 function buildFeed() {
   songFeed.innerHTML = "";
-
-  // Duplicate first and last for smooth infinite
   const loopSongs = [allSongs[allSongs.length-1], ...allSongs, allSongs[0]];
 
-  loopSongs.forEach((song) => {
+  loopSongs.forEach(song => {
     const card = document.createElement("div");
     card.classList.add("song-card");
     card.innerHTML = `
@@ -70,7 +61,6 @@ function buildFeed() {
     const playOverlay = card.querySelector(".play-overlay");
     const selectBtn = card.querySelector(".sendBtn");
 
-    // Play/Pause
     playOverlay.addEventListener("click", () => {
       if (!currentAudio) currentAudio = new Audio(song.songURL);
       if (currentAudio.src !== song.songURL) { currentAudio.pause(); currentAudio = new Audio(song.songURL); }
@@ -79,69 +69,36 @@ function buildFeed() {
       else { currentAudio.pause(); playOverlay.style.display="block"; }
     });
 
-    // Select Button
-    selectBtn.addEventListener("click", () => {
-      handleSelectSong(song.title);
-    });
+    selectBtn.addEventListener("click", () => handleSelectSong(song.title));
   });
-
-  // Intersection Observer for auto-play & infinite scroll
-  const cards = document.querySelectorAll(".song-card");
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const index = Array.from(cards).indexOf(entry.target);
-        const song = loopSongs[index];
-        if (currentAudio) currentAudio.pause();
-        currentAudio = new Audio(song.songURL);
-        currentAudio.play();
-
-        // Hide all overlays
-        document.querySelectorAll(".play-overlay").forEach(p => p.style.display="block");
-        entry.target.querySelector(".play-overlay").style.display="none";
-
-        // Infinite scroll
-        if (index === 0) songFeed.scrollTop = cards[cards.length-2].offsetTop;
-        if (index === cards.length-1) songFeed.scrollTop = cards[1].offsetTop;
-      }
-    });
-  }, { threshold: 0.7 });
-
-  cards.forEach(card => observer.observe(card));
 }
 
-// ----------------- Handle Select -----------------
-function handleSelectSong(songTitle) {
-  selectedSongTitle = songTitle;
+// Handle select
+function handleSelectSong(title) {
+  selectedSongTitle = title;
   document.getElementById("selectedSongTitle").innerText = selectedSongTitle;
-
-  // Show mood modal
   moodModal.classList.add("active");
 }
 
-// ----------------- Mood & Form -----------------
+// Mood → Form
 window.selectMood = (mood) => {
   selectedMood = mood;
-
-  // Hide mood modal
   moodModal.classList.remove("active");
-
-  // Show form modal
-  formModal.classList.add("active");
-
-  // Update form title
-  const title = document.getElementById("formTitle");
-  title.innerText = mood === "love" 
-    ? "You picked ❤️!\nWHO CAME TO MIND?" 
-    : "You picked 🍿!\nWHO CAME TO MIND?";
+  setTimeout(() => {
+    formModal.classList.add("active");
+    document.getElementById("formTitle").innerText = mood === "love" 
+      ? "You picked ❤️!\nWHO CAME TO MIND?" 
+      : "You picked 🍿!\nWHO CAME TO MIND?";
+  }, 250);
 };
 
+// Close modal
 window.closeForm = () => {
-  formModal.classList.remove("active");
   moodModal.classList.remove("active");
+  formModal.classList.remove("active");
 };
 
-// ----------------- Submit -----------------
+// Submit
 window.submitTeahug = () => {
   const name = document.getElementById("userName").value.trim();
   const phone = document.getElementById("userWhatsapp").value.trim();
@@ -152,44 +109,37 @@ window.submitTeahug = () => {
   const encoded = encodeURIComponent(message);
   const whatsappNumber = "2348056882601";
   window.location.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
-
   formModal.classList.remove("active");
 };
 
-// ----------------- Countdown -----------------
+// Countdown logic (unchanged)
 function updateCountdown() {
   const now = new Date();
   const hour = now.getHours();
-
-  if (hour < 19) { // pre-hug
+  if (hour < 19) {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-
     let target = new Date(); target.setHours(19,0,0,0);
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
-  } else if (hour >= 19 && hour < 22) { // hug hour
+  } else if (hour >= 19 && hour < 22) {
     preHugSection.style.display = "none";
     hugHourTopCountdown.classList.remove("hidden");
     songFeed.style.display = "block";
-
     let target = new Date(); target.setHours(22,0,0,0);
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     hugHourTimer.textContent = `${h} : ${m} : ${s}`;
-
-    if (h==="03" && m==="00" && s==="00") showIntroPopup();
-  } else { // post-hug
+  } else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
-
     let target = new Date(); target.setDate(target.getDate()+1);
     target.setHours(19,0,0,0);
     const diff = target - now;
@@ -200,7 +150,7 @@ function updateCountdown() {
   }
 }
 
-// ----------------- Init -----------------
+// Init
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
