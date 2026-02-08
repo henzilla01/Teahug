@@ -80,22 +80,22 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
 }
 
 /* Form Modal (spacious, neon) */
-/* Form Modal (spacious, neon, auto-fit, no scroll) */
+
 /* ----------------- Form Modal ----------------- */
 #formModal .modal-card {
   background: linear-gradient(145deg, #111, #1a1a1a);
-  padding: 30px 25px;             /* comfortable padding */
+  padding: 30px 25px;
   border-radius: 20px;
   width: 90%;
-  max-width: 420px;               /* perfect width */
-  max-height: 80vh;               /* fit viewport without stretching */
+  max-width: 420px;
+  max-height: 80vh;            /* fits screen height */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;                      /* spacing between elements */
+  gap: 15px;
   text-align: center;
   box-shadow: 0 0 30px rgba(255,0,80,0.5), 0 0 60px rgba(255,0,150,0.2);
-  overflow: hidden;                /* no scroll on modal itself */
+  overflow: hidden;            /* no scroll on modal itself */
 }
 
 /* Scrollable content inside if needed */
@@ -104,7 +104,7 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;               /* only scroll inside if content exceeds max-height */
+  overflow-y: auto;           /* scroll only inside if content exceeds modal height */
 }
 
 /* Title */
@@ -157,4 +157,4 @@ body, html { height:100%; overflow:hidden; font-family: Arial, sans-serif; backg
   #formModal h2 { font-size: 1.5rem; }
   #formModal input { font-size: 0.95rem; padding: 10px; }
   #formModal .submit-btn, #formModal .close-btn { padding: 10px 20px; font-size: 0.95rem; }
-}
+  }
