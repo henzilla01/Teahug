@@ -63,10 +63,18 @@ function buildFeed() {
 
     playOverlay.addEventListener("click", () => {
       if (!currentAudio) currentAudio = new Audio(song.songURL);
-      if (currentAudio.src !== song.songURL) { currentAudio.pause(); currentAudio = new Audio(song.songURL); }
+      if (currentAudio.src !== song.songURL) {
+        currentAudio.pause();
+        currentAudio = new Audio(song.songURL);
+      }
 
-      if (currentAudio.paused) { currentAudio.play(); playOverlay.style.display="none"; }
-      else { currentAudio.pause(); playOverlay.style.display="block"; }
+      if (currentAudio.paused) {
+        currentAudio.play();
+        playOverlay.style.display = "none";
+      } else {
+        currentAudio.pause();
+        playOverlay.style.display = "block";
+      }
     });
 
     selectBtn.addEventListener("click", () => handleSelectSong(song.title));
@@ -108,9 +116,10 @@ window.selectMood = (mood) => {
   moodModal.classList.remove("active");
   setTimeout(() => {
     formModal.classList.add("active");
-    document.getElementById("formTitle").innerText = mood === "love" 
-      ? "You picked ❤️!\nWHO CAME TO MIND?" 
-      : "You picked 🍿!\nWHO CAME TO MIND?";
+    document.getElementById("formTitle").innerText =
+      mood === "love"
+        ? "You picked ❤️!\nWHO CAME TO MIND?"
+        : "You picked 🍿!\nWHO CAME TO MIND?";
   }, 250);
 };
 
@@ -128,7 +137,6 @@ window.submitTeahug = () => {
 
   const moodText = selectedMood === "love" ? "❤️ *Love* 💖" : "🍿 *Popcorn* 🎬";
 
-  // Formatted, playful message
   const message = `💛 *Teahug Surprise!*
 🎵 Song: *${selectedSongTitle}*
 🌟 Mood: ${moodText}
@@ -138,47 +146,59 @@ window.submitTeahug = () => {
 ✨ Sent with ❤️ from HugsHour!`;
 
   const encoded = encodeURIComponent(message);
-
-  // Send to your WhatsApp number
   const whatsappNumber = "2348056882601";
   window.location.href = `https://wa.me/${whatsappNumber}?text=${encoded}`;
 
-  formModal.classList.add("hidden");
+  formModal.classList.remove("active");
 };
 
-// Countdown logic (unchanged)
+// Countdown logic (FIXED visibility)
 function updateCountdown() {
   const now = new Date();
   const hour = now.getHours();
+
+  // Before Hug Hour (before 7PM)
   if (hour < 19) {
     preHugSection.style.display = "flex";
-    hugHourTopCountdown.classList.add("hidden");
+    hugHourTopCountdown.style.display = "none";   // FIX
     songFeed.style.display = "none";
-    let target = new Date(); target.setHours(19,0,0,0);
+
+    let target = new Date();
+    target.setHours(19,0,0,0);
+
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
-  } else if (hour >= 19 && hour < 20) {
-  preHugSection.style.display = "none";
-  hugHourTopCountdown.classList.remove("hidden");
-  songFeed.style.display = "block";
+  }
 
-  let target = new Date(); 
-  target.setHours(20,0,0,0); // Ends at 8PM (1 hour total)
+  // Hug Hour (7PM–8PM)
+  else if (hour >= 19 && hour < 20) {
+    preHugSection.style.display = "none";
+    hugHourTopCountdown.style.display = "block";  // FIX
+    songFeed.style.display = "block";
 
-  const diff = target - now;
-  const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
-  const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-  const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
-  hugHourTimer.textContent = `${h} : ${m} : ${s}`;
-} else {
+    let target = new Date();
+    target.setHours(20,0,0,0);
+
+    const diff = target - now;
+    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
+    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
+    hugHourTimer.textContent = `${h} : ${m} : ${s}`;
+  }
+
+  // After Hug Hour
+  else {
     preHugSection.style.display = "flex";
-    hugHourTopCountdown.classList.add("hidden");
+    hugHourTopCountdown.style.display = "none";   // FIX
     songFeed.style.display = "none";
-    let target = new Date(); target.setDate(target.getDate()+1);
+
+    let target = new Date();
+    target.setDate(target.getDate()+1);
     target.setHours(19,0,0,0);
+
     const diff = target - now;
     const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
@@ -191,5 +211,3 @@ function updateCountdown() {
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
-
-
