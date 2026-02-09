@@ -160,17 +160,20 @@ function updateCountdown() {
     const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
     const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
     preHugCountdown.textContent = `${h} : ${m} : ${s}`;
-  } else if (hour >= 19 && hour < 22) {
-    preHugSection.style.display = "none";
-    hugHourTopCountdown.classList.remove("hidden");
-    songFeed.style.display = "block";
-    let target = new Date(); target.setHours(22,0,0,0);
-    const diff = target - now;
-    const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
-    const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
-    const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
-    hugHourTimer.textContent = `${h} : ${m} : ${s}`;
-  } else {
+  } else if (hour >= 19 && hour < 20) {
+  preHugSection.style.display = "none";
+  hugHourTopCountdown.classList.remove("hidden");
+  songFeed.style.display = "block";
+
+  let target = new Date(); 
+  target.setHours(20,0,0,0); // Ends at 8PM (1 hour total)
+
+  const diff = target - now;
+  const h = String(Math.floor(diff/(1000*60*60))).padStart(2,"0");
+  const m = String(Math.floor((diff/(1000*60))%60)).padStart(2,"0");
+  const s = String(Math.floor((diff/1000)%60)).padStart(2,"0");
+  hugHourTimer.textContent = `${h} : ${m} : ${s}`;
+} else {
     preHugSection.style.display = "flex";
     hugHourTopCountdown.classList.add("hidden");
     songFeed.style.display = "none";
@@ -188,4 +191,5 @@ function updateCountdown() {
 loadSongs();
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
 
